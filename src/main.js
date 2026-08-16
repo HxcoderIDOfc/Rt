@@ -293,8 +293,8 @@ function renderDashboard(language, session, profile) {
   app.innerHTML = `
     <main class="mobile-shell">
       <header class="app-topbar">
-        <div><p class="eyebrow">Axynera v${appVersion}</p><h1>${title}</h1></div>
-        <div class="topbar-actions"><button class="icon-button">Search</button><button id="settingsBtn" class="icon-button">Setting</button></div>
+        <div><p class="eyebrow">${title} - v${appVersion}</p><h1>Axynera</h1></div>
+        <div class="topbar-actions"><button class="icon-button">Cari</button><button id="settingsBtn" class="icon-button">Setting</button></div>
       </header>
       <section class="profile-strip">
         ${avatarMarkup(profile, 'IP')}
