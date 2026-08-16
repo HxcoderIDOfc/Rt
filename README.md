@@ -21,6 +21,12 @@ Versi demo untuk app chat Axynera:
 - Profile sendiri hanya menampilkan tombol edit, sementara profile orang punya Message/Call.
 - Profile grup dan server tampil ringkas dengan avatar dan nama.
 - Icon navigasi dan tombol dibuat lebih rapi.
+- Tab Status dan Server dibuat list vertikal seperti Chat.
+- Topbar menghapus teks tema dan memakai menu titik tiga.
+- Settings dibuat lebih lengkap dengan menu Admin demo.
+- Admin demo mendukung pilihan ban permanent, time ban, dan unban.
+- Floating kontak bisa menampilkan kontak terdaftar atau tombol undang.
+- Edit profile memakai thumbnail besar dengan PP bertumpuk.
 - Slot AI siap disambungkan ke Cloudflare Worker.
 - Build APK manual lewat GitHub Actions.
 
@@ -75,7 +81,7 @@ Cara pakai:
 2. Buka tab **Actions**.
 3. Pilih **Build Android APK**.
 4. Klik **Run workflow**.
-5. Download artifact bernama `axynera-v0.6-demo-debug-apk`.
+5. Download artifact bernama `axynera-v0.7-demo-debug-apk`.
 
 File APK debug akan dibuat dari:
 
@@ -84,6 +90,17 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Changelog
+
+### v0.7.0-demo
+
+- Menambahkan icon baru untuk Chat, Grup, Status, Server, dan Panggilan.
+- Mengubah Status dan Server menjadi list vertikal seperti Chat.
+- Menghapus teks tema dari topbar dan menambahkan menu titik tiga.
+- Menambahkan floating kontak dengan status terdaftar atau undang.
+- Merapikan edit profile dengan thumbnail besar dan PP bertumpuk.
+- Menambahkan Settings yang lebih lengkap dan halaman Admin demo.
+- Menambahkan pilihan ban permanent, time ban, dan unban di Admin demo.
+- Mengubah artifact APK menjadi `axynera-v0.7-demo-debug-apk`.
 
 ### v0.6.0-demo
 
