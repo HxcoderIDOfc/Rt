@@ -11,6 +11,11 @@ Versi demo untuk app chat Axynera:
 - Login nomor HP + OTP demo.
 - Setup profile akun baru: foto, nama, username.
 - Dashboard mobile dengan navbar bawah: Chat, Grup, Status, Server, Panggilan.
+- Tema default Light Blue/Cyan, bukan hijau.
+- PP dan sampul/thumbnail mendukung image/GIF demo lokal.
+- Badge mini Verify, Dev, dan VIP tampil di belakang nama.
+- Profile floating modal saat avatar diklik.
+- Rich Presence demo opt-in untuk playing/listening.
 - Slot AI siap disambungkan ke Cloudflare Worker.
 - Build APK manual lewat GitHub Actions.
 
@@ -65,7 +70,7 @@ Cara pakai:
 2. Buka tab **Actions**.
 3. Pilih **Build Android APK**.
 4. Klik **Run workflow**.
-5. Download artifact bernama `axynera-v0.3-demo-debug-apk`.
+5. Download artifact bernama `axynera-v0.4-demo-debug-apk`.
 
 File APK debug akan dibuat dari:
 
@@ -74,6 +79,17 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Changelog
+
+### v0.4.0-demo
+
+- Mengubah tema default menjadi Light Blue/Cyan.
+- Menambahkan logo AX berbasis CSS, splash light, dan halaman onboarding baru.
+- Menambahkan upload PP dan sampul/thumbnail demo dengan dukungan image/GIF.
+- Menambahkan badge mini Verify, Dev, dan VIP di belakang nama.
+- Menambahkan profile floating modal saat avatar diklik.
+- Menambahkan halaman Chat, Grup, Status, Server, Panggilan, dan Settings yang lebih lengkap.
+- Menambahkan Rich Presence demo opt-in untuk playing/listening.
+- Mengubah artifact APK menjadi `axynera-v0.4-demo-debug-apk`.
 
 ### v0.3.0-demo
 
