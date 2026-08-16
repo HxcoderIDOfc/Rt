@@ -4,6 +4,8 @@ Versi awal untuk app Axynera:
 
 - Vite untuk UI web.
 - Capacitor untuk bungkus jadi APK Android.
+- Package Android: `com.axynera.official`.
+- Permission Android awal: `android.permission.INTERNET`.
 - Login Google dummy, sekali klik langsung masuk dashboard.
 - Backend Cloudflare Worker bisa disambungkan nanti.
 - Build APK manual lewat GitHub Actions.
@@ -70,5 +72,7 @@ android/app/build/outputs/apk/debug/app-debug.apk
 - Menambahkan halaman login dummy dengan tombol Google.
 - Menambahkan dashboard awal Axynera.
 - Menambahkan session dummy via `localStorage`.
+- Menambahkan package Android `com.axynera.official`.
+- Menambahkan permission Android `android.permission.INTERNET`.
 - Menambahkan konfigurasi Capacitor Android.
 - Menambahkan workflow GitHub Actions manual untuk build APK debug.
