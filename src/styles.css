@@ -297,6 +297,12 @@ button { border: 0; cursor: pointer; }
   text-align: center;
 }
 
+.profile-media-editor {
+  position: relative;
+  display: grid;
+  padding-bottom: 58px;
+}
+
 .avatar-upload input,
 .cover-upload input {
   display: none;
@@ -309,10 +315,36 @@ button { border: 0; cursor: pointer; }
   font-weight: 850;
 }
 
+.profile-cover-upload {
+  min-height: 156px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(255, 255, 255, 0.75), transparent 24%),
+    linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(6, 182, 212, 0.78));
+  color: #fff;
+}
+
 .cover-upload img {
   width: 100%;
-  height: 88px;
+  height: 100%;
+  min-height: 88px;
   object-fit: cover;
+}
+
+.profile-avatar-upload {
+  position: absolute;
+  left: 18px;
+  bottom: 0;
+  justify-items: start;
+  gap: 3px;
+  color: var(--navy);
+}
+
+.profile-avatar-upload .avatar.big {
+  width: 104px;
+  height: 104px;
+  border: 5px solid #fff;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
 }
 
 .permission-row {
@@ -416,6 +448,26 @@ button { border: 0; cursor: pointer; }
   min-height: 0;
   overflow-y: auto;
   padding: 10px 0;
+}
+
+.contacts-fab {
+  position: absolute;
+  right: 18px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.28);
+}
+
+.contacts-fab .app-icon {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .segmented {
@@ -659,7 +711,7 @@ button.avatar:active {
 .status-grid,
 .server-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 10px;
   padding: 12px 14px;
 }
@@ -673,12 +725,14 @@ button.avatar:active {
   background: linear-gradient(160deg, #fff, #f0f7ff);
 }
 
-.server-grid article {
+.server-grid article,
+.list-item {
   cursor: pointer;
   transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
-.server-grid article:active {
+.server-grid article:active,
+.list-item:active {
   transform: scale(0.98);
   border-color: #b8d2ff;
   box-shadow: 0 16px 30px rgba(37, 99, 235, 0.12);
@@ -743,7 +797,8 @@ button.avatar:active {
   text-align: center;
 }
 
-.permission-modal {
+.permission-modal,
+.contacts-modal {
   position: relative;
   display: grid;
   justify-items: center;
@@ -757,15 +812,76 @@ button.avatar:active {
   text-align: center;
 }
 
-.permission-modal h2 {
+.permission-modal h2,
+.contacts-modal h2 {
   margin: 0;
 }
 
-.permission-modal p {
+.permission-modal p,
+.contacts-modal p {
   margin: 0;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.45;
+}
+
+.contacts-modal {
+  justify-items: stretch;
+  max-height: min(78vh, 620px);
+  overflow-y: auto;
+}
+
+.contacts-modal h2,
+.contacts-modal p {
+  text-align: center;
+}
+
+.mini-primary {
+  min-height: 44px;
+  border-radius: 13px;
+}
+
+.contact-list {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.contact-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #f8fbff;
+}
+
+.contact-row strong,
+.contact-row small {
+  display: block;
+}
+
+.contact-row small {
+  color: var(--muted);
+}
+
+.contact-row button {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+.contact-row .registered {
+  color: #fff;
+  background: var(--blue);
+}
+
+.contact-row .invite {
+  color: var(--blue);
+  background: #eaf2ff;
 }
 
 .permission-modal small {
@@ -898,6 +1014,45 @@ button.avatar:active {
 
 .settings-list {
   padding: 12px 14px;
+}
+
+.admin-panel {
+  display: grid;
+  gap: 12px;
+  padding: 12px 14px 24px;
+}
+
+.admin-card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(160deg, #fff, #f0f7ff);
+}
+
+.admin-card p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.admin-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.admin-actions button {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--blue);
+  background: #fff;
+  font-weight: 900;
+}
+
+.admin-actions .active {
+  color: #fff;
+  border-color: transparent;
+  background: var(--blue);
 }
 
 .settings-list article,
