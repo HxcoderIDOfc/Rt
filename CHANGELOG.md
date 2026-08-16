@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.0-demo
+
+- Changed the profile modal so the user's own profile only shows edit actions.
+- Added contact profile cards from Chat and Calls with Message/Call actions.
+- Added compact Group and Server profile cards.
+- Refined navigation, top action, and profile action icons.
+- Renamed the debug APK artifact to `axynera-v0.6-demo-debug-apk`.
+
 ## v0.5.0-demo
 
 - Added a permission center popup after entering the app.
