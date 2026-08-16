@@ -1,6 +1,6 @@
 import './styles.css';
 
-const appVersion = '0.6.0-demo';
+const appVersion = '0.7.0-demo';
 const langKey = 'axynera_v04_language';
 const sessionKey = 'axynera_v04_session';
 const profileKey = 'axynera_v04_profile';
@@ -20,11 +20,11 @@ const languages = [
 ];
 
 const navTabs = [
-  { id: 'chat', label: 'Chat', icon: '✦' },
-  { id: 'groups', label: 'Grup', icon: '⬢' },
-  { id: 'status', label: 'Status', icon: '◌' },
-  { id: 'server', label: 'Server', icon: '▦' },
-  { id: 'calls', label: 'Panggilan', icon: '◍' }
+  { id: 'chat', label: 'Chat', icon: '✉' },
+  { id: 'groups', label: 'Grup', icon: '◈' },
+  { id: 'status', label: 'Status', icon: '◒' },
+  { id: 'server', label: 'Server', icon: '▤' },
+  { id: 'calls', label: 'Panggilan', icon: '☏' }
 ];
 
 const badges = {
@@ -68,10 +68,25 @@ const calls = [
   { name: 'Cloud Team', avatar: 'CT', bio: 'Video', time: '2 hari lalu', badges: ['verify'] }
 ];
 
+const contactBook = [
+  { name: 'Fadhil', phone: '+6281200000001', avatar: 'FA', registered: true },
+  { name: 'Nina', phone: '+6281200000002', avatar: 'NI', registered: true },
+  { name: 'Raka', phone: '+6281200000003', avatar: 'RA', registered: false },
+  { name: 'Maya', phone: '+6281200000004', avatar: 'MA', registered: false }
+];
+
+const adminUsers = [
+  { name: 'Nera Bot', avatar: 'NB', status: 'Aktif', ban: 'Tidak' },
+  { name: 'Build APK', avatar: 'BA', status: 'Aktif', ban: 'Tidak' },
+  { name: 'Dev Community', avatar: 'DC', status: 'Warning', ban: 'Time 24j' },
+  { name: 'Spam Demo', avatar: 'SD', status: 'Diblokir', ban: 'Permanent' }
+];
+
 const permissionList = ['Camera', 'Mic', 'Location', 'Contacts', 'Storage', 'SMS'];
 let activeTab = 'chat';
 let showProfileModal = false;
 let showPermissionModal = false;
+let showContactsModal = false;
 let activeEntity = { type: 'me' };
 
 function safeJson(value) {
@@ -203,6 +218,10 @@ function resolveEntity(profile, type = 'me', index = 0) {
   if (type === 'server') {
     return { type, ...servers[index], username: 'server' };
   }
+  if (type === 'status') {
+    const statuses = getActiveStatuses();
+    return { type: 'contact', ...statuses[index], bio: statuses[index]?.title, username: statuses[index]?.name?.toLowerCase().replace(/\s+/g, '_') };
+  }
   if (type === 'call') {
     return { type: 'contact', ...calls[index], username: calls[index]?.name?.toLowerCase().replace(/\s+/g, '_') };
   }
@@ -319,15 +338,17 @@ function renderProfileSetup(language, session) {
       <button class="back-button" type="button">‹</button>
       <div class="setup-title"><h1>Setup Profile</h1><p>Lengkapi informasi profil Anda</p></div>
       <form id="profileForm" class="form-stack">
-        <label class="avatar-upload">
-          <input id="photoInput" type="file" accept="image/*,.gif" />
-          <span id="avatarPreview" class="avatar big">IP</span>
-          <strong>Foto Profil</strong><small>GIF didukung</small>
-        </label>
-        <label class="cover-upload">
+        <section class="profile-media-editor">
+        <label class="cover-upload profile-cover-upload">
           <input id="coverInput" type="file" accept="image/*,.gif" />
           <span id="coverPreview">Sampul / Thumbnail (Gambar / GIF)</span>
         </label>
+          <label class="avatar-upload profile-avatar-upload">
+            <input id="photoInput" type="file" accept="image/*,.gif" />
+            <span id="avatarPreview" class="avatar big">IP</span>
+            <strong>Foto Profil</strong><small>GIF didukung</small>
+          </label>
+        </section>
         <label>Nama<input name="name" value="Axynera User" /></label>
         <label>Username<input name="username" value="axynera_user" /></label>
         <div class="permission-row">${permissionList.map((item) => `<span>${item} ✓</span>`).join('')}</div>
@@ -370,7 +391,7 @@ function renderProfileSetup(language, session) {
 }
 
 function renderRows(items, type = 'chat') {
-  const profileType = type === 'calls' ? 'call' : type === 'groups' ? 'group' : 'contact';
+  const profileType = type === 'calls' ? 'call' : type === 'groups' ? 'group' : type === 'server' ? 'server' : type === 'status' ? 'status' : 'contact';
   return items.map((item, index) => `
     <article class="list-item">
       ${avatarMarkup(item.avatar, 'AX', '', profileType, index)}
@@ -382,6 +403,7 @@ function renderRows(items, type = 'chat') {
         <small>${item.time || item.meta || ''}</small>
         ${item.unread ? `<b>${item.unread}</b>` : ''}
         ${type === 'calls' ? '<button class="mini-action">Call</button>' : ''}
+        ${type === 'server' ? '<button class="mini-action">Open</button>' : ''}
       </aside>
     </article>
   `).join('');
@@ -396,14 +418,14 @@ function renderContent(profile) {
     return `
       <header class="page-title"><h2>Status</h2><button>${miniIcon('Tambah status', '+')}</button></header>
       <section class="status-me">${avatarMarkup(profile, 'IP')}<div><strong>Status saya</strong><p>Demo status otomatis hilang setelah 24 jam</p></div><span>24j</span></section>
-      <section class="status-grid">${activeStatuses.map((item) => `<article><span class="avatar">${item.avatar}</span><strong>${item.name}</strong><p>${item.title}</p><small>${item.meta} • tersisa ${Math.max(1, 24 - Math.floor((Date.now() - new Date(item.createdAt).getTime()) / (60 * 60 * 1000)))}j</small></article>`).join('')}</section>
+      <section class="list-stack">${renderRows(activeStatuses.map((item) => ({ ...item, bio: item.title, time: `${item.meta} • tersisa ${Math.max(1, 24 - Math.floor((Date.now() - new Date(item.createdAt).getTime()) / (60 * 60 * 1000)))}j` })), 'status')}</section>
       ${activeStatuses.length ? '' : '<p class="empty-note">Belum ada status aktif.</p>'}
     `;
   }
   if (activeTab === 'server') {
     return `
       <header class="page-title"><h2>Server</h2><button>${miniIcon('Tambah server', '+')}</button></header>
-      <section class="server-grid">${servers.map((server, index) => `<article data-profile-type="server" data-profile-index="${index}"><span class="avatar">${server.avatar}</span><strong>${server.name}</strong><p>${server.bio}</p></article>`).join('')}</section>
+      <section class="list-stack">${renderRows(servers.map((server) => ({ ...server, time: 'Server' })), 'server')}</section>
       <section class="channel-list">${servers[0].channels.map((channel) => `<button># ${channel}<span>DEV</span></button>`).join('')}</section>
     `;
   }
@@ -423,14 +445,16 @@ function renderDashboard(language, session, profile) {
       <header class="topbar">
         <div class="topbar-left">
           ${avatarMarkup(profile, 'IP', 'top-avatar')}
-          <div><h1>Axynera</h1><p>${title} • ${profile.theme || 'Light'}</p></div>
+          <div><h1>Axynera</h1><p>${title}</p></div>
         </div>
-        <div class="topbar-actions"><button>${miniIcon('Cari', '⌕')}</button><button id="settingsBtn">${miniIcon('Pengaturan', '⚙')}</button></div>
+        <div class="topbar-actions"><button>${miniIcon('Cari', '⌕')}</button><button id="settingsBtn">${miniIcon('Menu', '⋮')}</button></div>
       </header>
       <section class="content">${renderContent(profile)}</section>
+      <button id="contactsFab" class="contacts-fab">${miniIcon('Kontak', '+')}</button>
       <nav class="bottom-nav">${navTabs.map((tab) => `<button class="${activeTab === tab.id ? 'active' : ''}" data-tab="${tab.id}"><span>${tab.icon}</span>${tab.label}</button>`).join('')}</nav>
       ${showProfileModal ? renderProfileModal(resolveEntity(profile, activeEntity.type, activeEntity.index), profile) : ''}
       ${showPermissionModal ? renderPermissionModal() : ''}
+      ${showContactsModal ? renderContactsModal() : ''}
     </main>
   `;
 
@@ -450,6 +474,10 @@ function renderDashboard(language, session, profile) {
     });
   });
   document.querySelector('#settingsBtn').addEventListener('click', () => renderSettings(language, session, profile));
+  document.querySelector('#contactsFab').addEventListener('click', () => {
+    showContactsModal = true;
+    renderDashboard(language, session, profile);
+  });
   document.querySelector('#closeModal')?.addEventListener('click', () => {
     showProfileModal = false;
     renderDashboard(language, session, profile);
@@ -467,6 +495,23 @@ function renderDashboard(language, session, profile) {
     localStorage.setItem(permissionKey, JSON.stringify({ skippedAt: new Date().toISOString() }));
     showPermissionModal = false;
     renderDashboard(language, session, profile);
+  });
+  document.querySelector('#closeContacts')?.addEventListener('click', () => {
+    showContactsModal = false;
+    renderDashboard(language, session, profile);
+  });
+  document.querySelector('#pickContacts')?.addEventListener('click', async () => {
+    const button = document.querySelector('#pickContacts');
+    button.textContent = 'Mengecek...';
+    button.disabled = true;
+    if (navigator.contacts?.select) {
+      try {
+        await navigator.contacts.select(['name', 'tel'], { multiple: true });
+      } catch {
+        // Demo tetap memakai daftar kontak lokal kalau Contacts API tidak tersedia.
+      }
+    }
+    button.textContent = 'Kontak Demo Aktif';
   });
 }
 
@@ -526,6 +571,28 @@ function renderPermissionModal() {
   `;
 }
 
+function renderContactsModal() {
+  return `
+    <div class="modal-shade">
+      <section class="contacts-modal">
+        <button id="closeContacts" class="close-button">×</button>
+        <h2>Kontak</h2>
+        <p>Demo deteksi kontak: yang sudah daftar bisa dichat, yang belum daftar tampil sebagai undangan.</p>
+        <button id="pickContacts" class="primary-button mini-primary">Ambil Kontak</button>
+        <section class="contact-list">
+          ${contactBook.map((contact) => `
+            <article class="contact-row">
+              <span class="avatar">${contact.avatar}</span>
+              <div><strong>${contact.name}</strong><small>${contact.phone}</small></div>
+              <button class="${contact.registered ? 'registered' : 'invite'}">${contact.registered ? 'Chat' : 'Undang'}</button>
+            </article>
+          `).join('')}
+        </section>
+      </section>
+    </div>
+  `;
+}
+
 function renderSettings(language, session, profile) {
   app.innerHTML = `
     <main class="app-shell settings-page">
@@ -533,9 +600,11 @@ function renderSettings(language, session, profile) {
       <section class="settings-list">
         <article>${avatarMarkup(profile, 'IP')}<div><strong>${profile.name}${badgeMarkup(['verify', 'dev', 'vip'])}</strong><p>@${profile.username}</p></div><span>›</span></article>
         <button><span>Bahasa</span><strong>${language.name}</strong></button>
-        <button><span>Tema</span><strong>${profile.theme || 'Light'}</strong></button>
-        <button><span>Rich Presence</span><strong>Opt-in</strong></button>
+        <button><span>Tampilan</span><strong>Default</strong></button>
+        <button><span>Rich Presence</span><strong>Aktif</strong></button>
         <button id="permissionSettings"><span>Izin Aplikasi</span><strong>Kelola</strong></button>
+        <button id="contactsSettings"><span>Kontak</span><strong>Sinkron</strong></button>
+        <button id="adminSettings"><span>Admin</span><strong>Moderasi</strong></button>
         <button class="danger" id="logout">Keluar Demo</button>
       </section>
     </main>
@@ -552,11 +621,46 @@ function renderSettings(language, session, profile) {
     showPermissionModal = true;
     renderDashboard(language, session, profile);
   });
+  document.querySelector('#contactsSettings').addEventListener('click', () => {
+    showContactsModal = true;
+    renderDashboard(language, session, profile);
+  });
+  document.querySelector('#adminSettings').addEventListener('click', () => renderAdminSettings(language, session, profile));
   document.querySelector('[data-profile-type]')?.addEventListener('click', () => {
     activeEntity = { type: 'me' };
     showProfileModal = true;
     renderDashboard(language, session, profile);
   });
+}
+
+function renderAdminSettings(language, session, profile) {
+  app.innerHTML = `
+    <main class="app-shell settings-page">
+      <header class="topbar simple"><button id="backSettings">‹</button><h1>Admin</h1></header>
+      <section class="admin-panel">
+        <article class="admin-card">
+          <strong>Moderasi User</strong>
+          <p>Demo panel untuk banned permanent atau banned dengan waktu.</p>
+        </article>
+        <section class="admin-actions">
+          <button class="active">Permanent</button>
+          <button>Time 1 jam</button>
+          <button>Time 24 jam</button>
+          <button>Unban</button>
+        </section>
+        <section class="list-stack">
+          ${adminUsers.map((user) => `
+            <article class="list-item">
+              <span class="avatar">${user.avatar}</span>
+              <div><strong>${user.name}</strong><p>${user.status}</p></div>
+              <aside><small>${user.ban}</small><button class="mini-action">Kelola</button></aside>
+            </article>
+          `).join('')}
+        </section>
+      </section>
+    </main>
+  `;
+  document.querySelector('#backSettings').addEventListener('click', () => renderSettings(language, session, profile));
 }
 
 render();
