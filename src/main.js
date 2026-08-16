@@ -293,14 +293,13 @@ function renderDashboard(language, session, profile) {
   app.innerHTML = `
     <main class="mobile-shell">
       <header class="app-topbar">
-        <div><p class="eyebrow">${title} - v${appVersion}</p><h1>Axynera</h1></div>
-        <div class="topbar-actions"><button class="icon-button">Cari</button><button id="settingsBtn" class="icon-button">Setting</button></div>
+        <div class="topbar-brand">
+          ${avatarMarkup(profile, 'IP')}
+          <div><p class="eyebrow">${title} - v${appVersion}</p><h1>Axynera</h1></div>
+        </div>
+        <div class="topbar-actions"><button class="icon-button">Cari</button><button id="settingsBtn" class="icon-button">Set</button></div>
       </header>
-      <section class="profile-strip">
-        ${avatarMarkup(profile, 'IP')}
-        <div><strong>${profile.name}</strong><p>@${profile.username} - ${session.phone}</p></div>
-        <span>${language.name}</span>
-      </section>
+      <section class="account-line"><strong>${profile.name}</strong><span>@${profile.username}</span><small>${language.name}</small></section>
       <section class="content-panel">${tabContent(profile)}</section>
       <nav class="bottom-nav">
         ${tabs.map((tab) => `<button class="${tab.id === activeTab ? 'active' : ''}" data-tab="${tab.id}"><span>${tab.icon}</span>${tab.label}</button>`).join('')}
