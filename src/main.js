@@ -1,9 +1,12 @@
 import './styles.css';
 
-const appVersion = '0.4.0-demo';
+const appVersion = '0.5.0-demo';
 const langKey = 'axynera_v04_language';
 const sessionKey = 'axynera_v04_session';
 const profileKey = 'axynera_v04_profile';
+const permissionKey = 'axynera_v05_permissions_seen';
+const statusKey = 'axynera_v05_statuses';
+const dayMs = 24 * 60 * 60 * 1000;
 
 const app = document.querySelector('#app');
 
@@ -45,11 +48,11 @@ const groups = [
   { name: 'AI Lab', avatar: 'AI', bio: 'Model training complete.', meta: '73 member', badges: ['verify', 'dev'] }
 ];
 
-const statusCards = [
-  { name: 'Nera Bot', avatar: 'NB', title: 'GIF demo', meta: '12:28' },
-  { name: 'Cloud Team', avatar: 'CT', title: 'Cloud ready', meta: '10:45' },
-  { name: 'Design Hub', avatar: 'DH', title: 'Mockup baru', meta: 'Kemarin' },
-  { name: 'AI Lab', avatar: 'AI', title: 'Neon mode', meta: 'Kemarin' }
+const defaultStatuses = [
+  { name: 'Nera Bot', avatar: 'NB', title: 'GIF demo', hoursAgo: 2 },
+  { name: 'Cloud Team', avatar: 'CT', title: 'Cloud ready', hoursAgo: 7 },
+  { name: 'Design Hub', avatar: 'DH', title: 'Mockup baru', hoursAgo: 19 },
+  { name: 'AI Lab', avatar: 'AI', title: 'Expired demo', hoursAgo: 28 }
 ];
 
 const servers = [
@@ -65,9 +68,10 @@ const calls = [
   { name: 'Cloud Team', avatar: 'CT', bio: 'Video', time: '2 hari lalu', badges: ['verify'] }
 ];
 
-const permissionList = ['Camera', 'Contacts', 'Storage'];
+const permissionList = ['Camera', 'Mic', 'Location', 'Contacts', 'Storage', 'SMS'];
 let activeTab = 'chat';
 let showProfileModal = false;
+let showPermissionModal = false;
 
 function safeJson(value) {
   try {
@@ -89,8 +93,76 @@ function getProfile() {
   return safeJson(localStorage.getItem(profileKey));
 }
 
+function getStoredStatuses() {
+  const stored = safeJson(localStorage.getItem(statusKey));
+  if (Array.isArray(stored) && stored.length) {
+    return stored;
+  }
+  const seed = defaultStatuses.map((status) => ({
+    ...status,
+    createdAt: new Date(Date.now() - status.hoursAgo * 60 * 60 * 1000).toISOString()
+  }));
+  localStorage.setItem(statusKey, JSON.stringify(seed));
+  return seed;
+}
+
 function setProfile(profile) {
   localStorage.setItem(profileKey, JSON.stringify(profile));
+}
+
+function getActiveStatuses() {
+  return getStoredStatuses()
+    .filter((status) => Date.now() - new Date(status.createdAt).getTime() < dayMs)
+    .map((status) => {
+      const ageMs = Date.now() - new Date(status.createdAt).getTime();
+      const hours = Math.max(0, Math.floor(ageMs / (60 * 60 * 1000)));
+      return { ...status, meta: hours <= 0 ? 'Baru saja' : `${hours} jam lalu` };
+    });
+}
+
+function ensurePermissionPrompt() {
+  if (!localStorage.getItem(permissionKey)) {
+    showPermissionModal = true;
+  }
+}
+
+async function requestRuntimePermissions() {
+  const results = [];
+
+  if ('Notification' in window) {
+    const result = await Notification.requestPermission();
+    results.push(`Notifikasi: ${result}`);
+  }
+
+  if (navigator.mediaDevices?.getUserMedia) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+      stream.getTracks().forEach((track) => track.stop());
+      results.push('Kamera/Mic: granted');
+    } catch {
+      results.push('Kamera/Mic: belum diizinkan');
+    }
+  }
+
+  if (navigator.geolocation) {
+    await new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          results.push('Lokasi: granted');
+          resolve();
+        },
+        () => {
+          results.push('Lokasi: belum diizinkan');
+          resolve();
+        },
+        { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+      );
+    });
+  }
+
+  results.push('Kontak/Storage/SMS: siap via izin Android');
+  localStorage.setItem(permissionKey, JSON.stringify({ requestedAt: new Date().toISOString(), results }));
+  return results;
 }
 
 function initials(name) {
@@ -136,6 +208,7 @@ function render() {
     renderProfileSetup(language, session);
     return;
   }
+  ensurePermissionPrompt();
   renderDashboard(language, session, profile);
 }
 
@@ -296,10 +369,12 @@ function renderContent(profile) {
     return `<header class="page-title"><h2>Grup</h2><button>＋</button></header><section class="list-stack">${renderRows(groups)}</section>`;
   }
   if (activeTab === 'status') {
+    const activeStatuses = getActiveStatuses();
     return `
       <header class="page-title"><h2>Status</h2><button>▣</button></header>
-      <section class="status-me">${avatarMarkup(profile, 'IP')}<div><strong>Status saya</strong><p>Ketuk untuk menambah status</p></div></section>
-      <section class="status-grid">${statusCards.map((item) => `<article><span class="avatar">${item.avatar}</span><strong>${item.name}</strong><p>${item.title}</p><small>${item.meta}</small></article>`).join('')}</section>
+      <section class="status-me">${avatarMarkup(profile, 'IP')}<div><strong>Status saya</strong><p>Demo status otomatis hilang setelah 24 jam</p></div><span>24j</span></section>
+      <section class="status-grid">${activeStatuses.map((item) => `<article><span class="avatar">${item.avatar}</span><strong>${item.name}</strong><p>${item.title}</p><small>${item.meta} • tersisa ${Math.max(1, 24 - Math.floor((Date.now() - new Date(item.createdAt).getTime()) / (60 * 60 * 1000)))}j</small></article>`).join('')}</section>
+      ${activeStatuses.length ? '' : '<p class="empty-note">Belum ada status aktif.</p>'}
     `;
   }
   if (activeTab === 'server') {
@@ -332,6 +407,7 @@ function renderDashboard(language, session, profile) {
       <section class="content">${renderContent(profile)}</section>
       <nav class="bottom-nav">${navTabs.map((tab) => `<button class="${activeTab === tab.id ? 'active' : ''}" data-tab="${tab.id}"><span>${tab.icon}</span>${tab.label}</button>`).join('')}</nav>
       ${showProfileModal ? renderProfileModal(profile) : ''}
+      ${showPermissionModal ? renderPermissionModal() : ''}
     </main>
   `;
 
@@ -354,6 +430,19 @@ function renderDashboard(language, session, profile) {
     renderDashboard(language, session, profile);
   });
   document.querySelector('#editProfile')?.addEventListener('click', () => renderProfileSetup(language, session));
+  document.querySelector('#allowPermissions')?.addEventListener('click', async () => {
+    const button = document.querySelector('#allowPermissions');
+    button.textContent = 'Meminta izin...';
+    button.disabled = true;
+    await requestRuntimePermissions();
+    showPermissionModal = false;
+    renderDashboard(language, session, profile);
+  });
+  document.querySelector('#skipPermissions')?.addEventListener('click', () => {
+    localStorage.setItem(permissionKey, JSON.stringify({ skippedAt: new Date().toISOString() }));
+    showPermissionModal = false;
+    renderDashboard(language, session, profile);
+  });
 }
 
 function renderProfileModal(profile) {
@@ -374,6 +463,27 @@ function renderProfileModal(profile) {
   `;
 }
 
+function renderPermissionModal() {
+  return `
+    <div class="modal-shade">
+      <section class="permission-modal">
+        <span class="round-icon">▣</span>
+        <h2>Izin Axynera</h2>
+        <p>Aktifkan izin demo supaya kamera, mic, lokasi, notifikasi, storage, kontak, dan SMS siap dipakai saat fiturnya dibuat.</p>
+        <div class="permission-grid">
+          ${permissionList.map((item) => `<span>${item}</span>`).join('')}
+          <span>Notifications</span>
+        </div>
+        <small>Kontak, SMS, dan storage sudah disiapkan di manifest Android. Popup asli muncul sesuai dukungan perangkat.</small>
+        <div class="modal-actions permission-actions">
+          <button id="skipPermissions">Nanti</button>
+          <button id="allowPermissions">Izinkan semua</button>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
 function renderSettings(language, session, profile) {
   app.innerHTML = `
     <main class="app-shell settings-page">
@@ -383,7 +493,7 @@ function renderSettings(language, session, profile) {
         <button><span>Bahasa</span><strong>${language.name}</strong></button>
         <button><span>Tema</span><strong>${profile.theme || 'Light'}</strong></button>
         <button><span>Rich Presence</span><strong>Opt-in</strong></button>
-        <button><span>Izin Aplikasi</span><strong>Kelola</strong></button>
+        <button id="permissionSettings"><span>Izin Aplikasi</span><strong>Kelola</strong></button>
         <button class="danger" id="logout">Keluar Demo</button>
       </section>
     </main>
@@ -395,6 +505,10 @@ function renderSettings(language, session, profile) {
     localStorage.removeItem(profileKey);
     showProfileModal = false;
     render();
+  });
+  document.querySelector('#permissionSettings').addEventListener('click', () => {
+    showPermissionModal = true;
+    renderDashboard(language, session, profile);
   });
   document.querySelector('[data-profile-open]')?.addEventListener('click', () => {
     showProfileModal = true;
