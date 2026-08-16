@@ -1,259 +1,349 @@
 import './styles.css';
 
-const appVersion = '0.2.0-demo';
-const sessionKey = 'axynera_chat_demo_user';
-
-const demoUser = {
-  name: 'Iprime',
-  email: 'demo@axynera.my.id',
-  avatar: 'IP',
-  status: 'Online'
-};
-
-const channels = [
-  { id: 'home', label: 'Home', tag: 'Axynera HQ', unread: 0 },
-  { id: 'general', label: 'General', tag: 'Public chat', unread: 4 },
-  { id: 'dev', label: 'Developer', tag: 'Worker & APK', unread: 2 },
-  { id: 'ai', label: 'Axynera AI', tag: 'CF Worker soon', unread: 0 }
-];
-
-const dmList = [
-  { name: 'Nera Bot', status: 'AI standby', avatar: 'NB' },
-  { name: 'Cloud Team', status: 'Storage ready', avatar: 'CT' },
-  { name: 'Build Log', status: 'APK success', avatar: 'BL' }
-];
-
-const messages = [
-  { from: 'Nera Bot', avatar: 'NB', text: 'Axynera chat demo aktif. Login email/password masih lokal dulu.' },
-  { from: 'Iprime', avatar: 'IP', own: true, text: 'Mantap. Nanti backend login sama chat realtime pakai CF Worker.' },
-  { from: 'Cloud Team', avatar: 'CT', text: 'Endpoint siap disambungkan: /auth/login, /rooms, /messages, /ai/chat.' }
-];
+const appVersion = '0.3.0-demo';
+const langKey = 'axynera_v03_language';
+const sessionKey = 'axynera_v03_session';
+const profileKey = 'axynera_v03_profile';
 
 const app = document.querySelector('#app');
 
-function getUser() {
-  const saved = localStorage.getItem(sessionKey);
-  return saved ? JSON.parse(saved) : null;
+const languages = [
+  { code: 'id', name: 'Indonesia', hello: 'Halo' },
+  { code: 'en', name: 'English', hello: 'Hello' },
+  { code: 'ms', name: 'Melayu', hello: 'Hai' },
+  { code: 'ja', name: 'Japanese', hello: 'Konnichiwa' },
+  { code: 'ko', name: 'Korean', hello: 'Annyeong' },
+  { code: 'ar', name: 'Arabic', hello: 'Marhaban' },
+  { code: 'hi', name: 'Hindi', hello: 'Namaste' },
+  { code: 'es', name: 'Spanish', hello: 'Hola' },
+  { code: 'fr', name: 'French', hello: 'Bonjour' },
+  { code: 'pt', name: 'Portuguese', hello: 'Ola' }
+];
+
+const permissionList = ['Internet', 'Storage', 'Camera', 'Microphone', 'Location', 'Contacts', 'SMS', 'Notifications'];
+const tabs = [
+  { id: 'chat', label: 'Chat', icon: 'C' },
+  { id: 'groups', label: 'Grup', icon: 'G' },
+  { id: 'status', label: 'Status', icon: 'S' },
+  { id: 'server', label: 'Server', icon: 'V' },
+  { id: 'calls', label: 'Panggilan', icon: 'P' }
+];
+
+const chatItems = [
+  { name: 'Nera Bot', message: 'AI nanti disambungkan ke Worker.', time: '22:14', badge: 2, avatar: 'NB' },
+  { name: 'Build APK', message: 'v0.3 demo siap dibuild manual.', time: '21:58', badge: 1, avatar: 'BA' },
+  { name: 'Cloud Team', message: 'Auth nomor HP demo dulu.', time: '20:35', badge: 0, avatar: 'CT' }
+];
+const groupItems = [
+  { name: 'Axynera Dev', message: 'Diskusi Worker, APK, dan UI.', avatar: 'AD' },
+  { name: 'Server Crew', message: 'Channel server siap diisi.', avatar: 'SC' },
+  { name: 'Design Lab', message: 'Tema app mobile messenger.', avatar: 'DL' }
+];
+const statusItems = [
+  { name: 'Iprime', note: 'Axynera v0.3 demo online', avatar: 'IP' },
+  { name: 'Nera Bot', note: 'Menunggu endpoint AI', avatar: 'NB' }
+];
+const serverItems = [
+  { name: 'Axynera HQ', note: 'Server utama', avatar: 'AX' },
+  { name: 'AI Lab', note: 'Channel AI dan eksperimen', avatar: 'AI' }
+];
+const callItems = [
+  { name: 'Cloud Team', note: 'Demo panggilan suara', avatar: 'CT' },
+  { name: 'Build APK', note: 'Demo panggilan video', avatar: 'BA' }
+];
+
+let activeTab = 'chat';
+
+function safeJson(value) {
+  try {
+    return value ? JSON.parse(value) : null;
+  } catch {
+    return null;
+  }
 }
 
-function saveUser(form) {
-  const email = form.get('email') || demoUser.email;
-  const name = String(email).split('@')[0] || demoUser.name;
-  localStorage.setItem(sessionKey, JSON.stringify({
-    ...demoUser,
-    name: name.charAt(0).toUpperCase() + name.slice(1),
-    email
-  }));
-  render();
+function getLanguage() {
+  return safeJson(localStorage.getItem(langKey));
 }
 
-function logout() {
-  localStorage.removeItem(sessionKey);
-  render();
+function getSession() {
+  return safeJson(localStorage.getItem(sessionKey));
 }
 
-function renderLogin() {
+function getProfile() {
+  return safeJson(localStorage.getItem(profileKey));
+}
+
+function initials(name) {
+  return String(name || 'Axynera')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join('');
+}
+
+function avatarMarkup(profile, fallback = 'AX') {
+  if (profile?.photo) {
+    return `<span class="avatar image"><img src="${profile.photo}" alt="${profile.name || 'Profile'}" /></span>`;
+  }
+  return `<span class="avatar">${profile?.avatar || fallback}</span>`;
+}
+
+function route() {
+  const language = getLanguage();
+  const session = getSession();
+  const profile = getProfile();
+
+  if (!language) {
+    renderSplash(() => renderLanguage());
+    return;
+  }
+  if (!session) {
+    renderSplash(() => renderPhoneLogin(language));
+    return;
+  }
+  if (!profile) {
+    renderProfileSetup(language, session);
+    return;
+  }
+  renderDashboard(language, session, profile);
+}
+
+function renderSplash(next) {
   app.innerHTML = `
-    <main class="auth-layout">
-      <section class="auth-hero">
-        <div class="brand-row">
-          <div class="brand-mark">AX</div>
-          <div>
-            <strong>Axynera</strong>
-            <span>Chat demo v${appVersion}</span>
-          </div>
-        </div>
-        <h1>Chat app rasa Discord + WA.</h1>
-        <p>Login demo dulu, backend-nya nanti dari Cloudflare Worker. AI tinggal masuk ke channel Axynera AI.</p>
-        <div class="hero-preview">
-          <div class="preview-bubble left">General sudah siap.</div>
-          <div class="preview-bubble right">AI nanti di sini.</div>
-          <div class="preview-bubble left">Realtime pakai Worker.</div>
-        </div>
+    <main class="splash-screen">
+      <div class="splash-orbit"></div>
+      <section class="splash-card">
+        <div class="brand-mark">AX</div>
+        <h1>Axynera</h1>
+        <p>Private messenger demo v${appVersion}</p>
+        <div class="loading-bar"><span></span></div>
       </section>
+    </main>
+  `;
+  window.setTimeout(next, 950);
+}
 
-      <section class="auth-card">
-        <p class="eyebrow">Demo login</p>
-        <h2>Masuk ke Axynera</h2>
-        <p class="muted">Pakai email/password apa saja untuk demo. Data disimpan lokal dulu.</p>
+function renderLanguage() {
+  const browserCode = (navigator.language || 'id').slice(0, 2);
+  const suggested = languages.find((lang) => lang.code === browserCode) || languages[0];
 
-        <form id="loginForm" class="login-form">
-          <label>
-            Email
-            <input name="email" type="email" value="demo@axynera.my.id" autocomplete="email" />
-          </label>
-          <label>
-            Password
-            <input name="password" type="password" value="axynera123" autocomplete="current-password" />
-          </label>
-          <button class="primary-button" type="submit">Masuk Demo</button>
-        </form>
-
-        <div class="backend-note">
-          <span>Backend target</span>
-          <strong>https://api.axynera.my.id</strong>
+  app.innerHTML = `
+    <main class="onboarding-page">
+      <section class="phone-preview">
+        <div class="preview-top"><span class="brand-mark small">AX</span><span>Axynera</span></div>
+        <h1>Pilih bahasa</h1>
+        <p>Dipakai sekali untuk setup awal. Nanti bisa diubah lagi dari Settings.</p>
+        <div class="language-pill">${suggested.hello}, ${suggested.name}</div>
+      </section>
+      <section class="setup-card">
+        <p class="eyebrow">Step 1</p>
+        <h2>Bahasa aplikasi</h2>
+        <div class="language-grid">
+          ${languages.map((lang) => `
+            <button class="language-option ${lang.code === suggested.code ? 'active' : ''}" data-code="${lang.code}">
+              <strong>${lang.name}</strong><span>${lang.hello}</span>
+            </button>
+          `).join('')}
         </div>
+        <button id="saveLanguage" class="primary-button">Lanjut</button>
       </section>
     </main>
   `;
 
-  document.querySelector('#loginForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    saveUser(new FormData(event.currentTarget));
+  let selected = suggested;
+  document.querySelectorAll('.language-option').forEach((button) => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.language-option').forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      selected = languages.find((lang) => lang.code === button.dataset.code) || languages[0];
+    });
+  });
+  document.querySelector('#saveLanguage').addEventListener('click', () => {
+    localStorage.setItem(langKey, JSON.stringify(selected));
+    renderPhoneLogin(selected);
   });
 }
 
-function renderServerRail() {
-  return `
-    <aside class="server-rail">
-      <button class="server-dot active">AX</button>
-      <button class="server-dot">AI</button>
-      <button class="server-dot">CL</button>
-      <button class="server-add">+</button>
-    </aside>
+function renderPhoneLogin(language) {
+  app.innerHTML = `
+    <main class="onboarding-page">
+      <section class="phone-preview login-visual">
+        <div class="preview-top"><span class="brand-mark small">AX</span><span>Axynera</span></div>
+        <h1>Masuk pakai nomor HP</h1>
+        <p>Kode OTP masih demo. Nomor apa saja langsung masuk ke tahap profile.</p>
+        <div class="mock-chat"><span>+62 812 0000 0000</span><strong>Kode demo: 123456</strong></div>
+      </section>
+      <section class="setup-card">
+        <p class="eyebrow">Step 2</p>
+        <h2>Verifikasi nomor</h2>
+        <form id="phoneForm" class="stack-form">
+          <label>Negara
+            <select name="country">
+              <option value="+62">Indonesia (+62)</option>
+              <option value="+60">Malaysia (+60)</option>
+              <option value="+1">US/Canada (+1)</option>
+              <option value="+81">Japan (+81)</option>
+            </select>
+          </label>
+          <label>Nomor HP<input name="phone" inputmode="tel" value="81200000000" autocomplete="tel" /></label>
+          <label>Kode demo<input name="otp" inputmode="numeric" value="123456" maxlength="6" /></label>
+          <button class="primary-button" type="submit">Masuk Demo</button>
+        </form>
+        <p class="fine-print">${language.hello}. Login ini belum kirim SMS beneran.</p>
+      </section>
+    </main>
   `;
+
+  document.querySelector('#phoneForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const session = {
+      phone: `${form.get('country')}${form.get('phone')}`,
+      createdAt: new Date().toISOString()
+    };
+    localStorage.setItem(sessionKey, JSON.stringify(session));
+    renderProfileSetup(language, session);
+  });
 }
 
-function renderSidebar(user) {
-  return `
-    <aside class="chat-sidebar">
-      <div class="sidebar-head">
-        <div>
-          <strong>Axynera Space</strong>
-          <span>Demo server</span>
-        </div>
-        <button class="tiny-button">+</button>
-      </div>
-
-      <div class="section-title">Channels</div>
-      <div class="channel-list">
-        ${channels.map((channel) => `
-          <button class="channel ${channel.id === 'general' ? 'active' : ''}" data-channel="${channel.id}">
-            <span># ${channel.label}</span>
-            ${channel.unread ? `<b>${channel.unread}</b>` : ''}
-            <small>${channel.tag}</small>
-          </button>
-        `).join('')}
-      </div>
-
-      <div class="section-title">Direct Message</div>
-      <div class="dm-list">
-        ${dmList.map((dm) => `
-          <button class="dm-item">
-            <span class="mini-avatar">${dm.avatar}</span>
-            <span>
-              <strong>${dm.name}</strong>
-              <small>${dm.status}</small>
-            </span>
-          </button>
-        `).join('')}
-      </div>
-
-      <div class="user-bar">
-        <span class="mini-avatar">${user.avatar}</span>
-        <span>
-          <strong>${user.name}</strong>
-          <small>${user.status}</small>
-        </span>
-        <button id="logout" class="tiny-button">Keluar</button>
-      </div>
-    </aside>
+function renderProfileSetup(language, session) {
+  app.innerHTML = `
+    <main class="onboarding-page">
+      <section class="phone-preview profile-visual">
+        <div class="profile-avatar-live" id="profileAvatarLive">IP</div>
+        <h1>Buat profile dulu</h1>
+        <p>Untuk akun baru: foto, nama, dan username disiapkan sebelum masuk dashboard.</p>
+        <div class="permission-cloud">${permissionList.map((item) => `<span>${item}</span>`).join('')}</div>
+      </section>
+      <section class="setup-card">
+        <p class="eyebrow">Step 3</p>
+        <h2>Edit profile</h2>
+        <form id="profileForm" class="stack-form">
+          <label class="upload-box"><input id="photoInput" name="photo" type="file" accept="image/*" /><span>Upload foto demo</span><small>Preview lokal, belum upload server.</small></label>
+          <label>Nama<input name="name" value="Iprime" autocomplete="name" /></label>
+          <label>Username<input name="username" value="iprime" autocomplete="username" /></label>
+          <button class="primary-button" type="submit">Masuk Dashboard</button>
+        </form>
+        <p class="fine-print">Nomor aktif: ${session.phone}. Bahasa: ${language.name}.</p>
+      </section>
+    </main>
   `;
+
+  let photo = '';
+  const liveAvatar = document.querySelector('#profileAvatarLive');
+  document.querySelector('#photoInput').addEventListener('change', (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      photo = String(reader.result);
+      liveAvatar.innerHTML = `<img src="${photo}" alt="Preview profile" />`;
+      liveAvatar.classList.add('has-image');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.querySelector('#profileForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const name = String(form.get('name') || 'Iprime').trim();
+    const username = String(form.get('username') || 'iprime').trim().replace(/^@/, '');
+    const profile = { name, username, photo, avatar: initials(name), bio: 'Axynera demo user' };
+    localStorage.setItem(profileKey, JSON.stringify(profile));
+    renderDashboard(language, session, profile);
+  });
 }
 
-function renderMessages() {
-  return messages.map((message) => `
-    <article class="message ${message.own ? 'own' : ''}">
-      <span class="mini-avatar">${message.avatar}</span>
-      <div>
-        <strong>${message.from}</strong>
-        <p>${message.text}</p>
-      </div>
+function renderList(items, type) {
+  return items.map((item) => `
+    <article class="list-item">
+      <span class="avatar">${item.avatar}</span>
+      <div><strong>${item.name}</strong><p>${item.message || item.note}</p></div>
+      <aside>
+        ${item.time ? `<small>${item.time}</small>` : ''}
+        ${item.badge ? `<b>${item.badge}</b>` : ''}
+        ${type === 'calls' ? '<button class="round-action">Call</button>' : ''}
+      </aside>
     </article>
   `).join('');
 }
 
-function renderChat(user) {
+function tabContent(profile) {
+  if (activeTab === 'groups') return `<div class="list-stack">${renderList(groupItems, 'groups')}</div>`;
+  if (activeTab === 'status') {
+    return `
+      <section class="status-hero">${avatarMarkup(profile, 'IP')}<div><strong>Status saya</strong><p>Tap untuk tambah status demo.</p></div><button class="round-action">+</button></section>
+      <div class="list-stack">${renderList(statusItems, 'status')}</div>
+    `;
+  }
+  if (activeTab === 'server') {
+    return `
+      <section class="server-card"><p class="eyebrow">Axynera Server</p><h2>Channel komunitas</h2><p>Server demo untuk nanti dihubungkan ke backend realtime dan AI.</p></section>
+      <div class="list-stack">${renderList(serverItems, 'server')}</div>
+    `;
+  }
+  if (activeTab === 'calls') return `<div class="list-stack">${renderList(callItems, 'calls')}</div>`;
+  return `<div class="list-stack">${renderList(chatItems, 'chat')}</div>`;
+}
+
+function renderDashboard(language, session, profile) {
+  const title = tabs.find((tab) => tab.id === activeTab)?.label || 'Chat';
   app.innerHTML = `
-    <main class="chat-app">
-      ${renderServerRail()}
-      ${renderSidebar(user)}
-
-      <section class="chat-panel">
-        <header class="chat-topbar">
-          <button id="menuToggle" class="mobile-menu">☰</button>
-          <div>
-            <p class="eyebrow"># General</p>
-            <h1>Axynera Chat</h1>
-          </div>
-          <div class="top-actions">
-            <span class="status-pill"><i></i> Online</span>
-            <button class="tiny-button">Cari</button>
-          </div>
-        </header>
-
-        <div class="info-strip">
-          <span>CF Worker backend demo</span>
-          <strong>/auth/login /messages /ai/chat</strong>
-        </div>
-
-        <div class="message-list" id="messageList">
-          ${renderMessages()}
-        </div>
-
-        <form id="messageForm" class="composer">
-          <button type="button">+</button>
-          <input name="message" placeholder="Ketik pesan demo..." autocomplete="off" />
-          <button type="submit">Kirim</button>
-        </form>
+    <main class="mobile-shell">
+      <header class="app-topbar">
+        <div><p class="eyebrow">Axynera v${appVersion}</p><h1>${title}</h1></div>
+        <div class="topbar-actions"><button class="icon-button">Search</button><button id="settingsBtn" class="icon-button">Setting</button></div>
+      </header>
+      <section class="profile-strip">
+        ${avatarMarkup(profile, 'IP')}
+        <div><strong>${profile.name}</strong><p>@${profile.username} - ${session.phone}</p></div>
+        <span>${language.name}</span>
       </section>
-
-      <aside class="right-panel">
-        <section class="ai-card">
-          <p class="eyebrow">Axynera AI</p>
-          <h2>AI slot siap</h2>
-          <p>Nanti tombol ini diarahkan ke Cloudflare Worker AI endpoint.</p>
-          <button class="primary-button" type="button">Buka AI</button>
-        </section>
-
-        <section class="member-card">
-          <h3>Online</h3>
-          ${dmList.map((dm) => `
-            <div class="member-row">
-              <span class="mini-avatar">${dm.avatar}</span>
-              <div>
-                <strong>${dm.name}</strong>
-                <small>${dm.status}</small>
-              </div>
-            </div>
-          `).join('')}
-        </section>
-      </aside>
+      <section class="content-panel">${tabContent(profile)}</section>
+      <nav class="bottom-nav">
+        ${tabs.map((tab) => `<button class="${tab.id === activeTab ? 'active' : ''}" data-tab="${tab.id}"><span>${tab.icon}</span>${tab.label}</button>`).join('')}
+      </nav>
     </main>
   `;
 
-  document.querySelector('#logout').addEventListener('click', logout);
-  document.querySelector('#messageForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    const input = event.currentTarget.elements.message;
-    const text = input.value.trim();
-    if (!text) return;
-    messages.push({ from: user.name, avatar: user.avatar, own: true, text });
-    input.value = '';
-    renderChat(user);
+  document.querySelectorAll('[data-tab]').forEach((button) => {
+    button.addEventListener('click', () => {
+      activeTab = button.dataset.tab;
+      renderDashboard(language, session, profile);
+    });
   });
-  document.querySelector('#menuToggle').addEventListener('click', () => {
-    document.body.classList.toggle('sidebar-open');
+  document.querySelector('#settingsBtn').addEventListener('click', () => renderSettings(language, session, profile));
+}
+
+function renderSettings(language, session, profile) {
+  app.innerHTML = `
+    <main class="mobile-shell settings-shell">
+      <header class="app-topbar">
+        <button id="backDashboard" class="icon-button">Back</button>
+        <div><p class="eyebrow">Pengaturan</p><h1>Settings</h1></div>
+      </header>
+      <section class="settings-card">${avatarMarkup(profile, 'IP')}<div><strong>${profile.name}</strong><p>@${profile.username} - ${session.phone}</p></div></section>
+      <section class="settings-card column">
+        <h2>Izin APK</h2>
+        <p>Untuk versi demo, izin disiapkan di manifest. Runtime request native bisa ditambah saat plugin camera, contact, location, dan notification dipasang.</p>
+        <div class="permission-grid">${permissionList.map((item) => `<span>${item}</span>`).join('')}</div>
+      </section>
+      <section class="settings-actions"><button id="resetLanguage" class="ghost-button">Ubah Bahasa</button><button id="logout" class="danger-button">Logout Demo</button></section>
+    </main>
+  `;
+
+  document.querySelector('#backDashboard').addEventListener('click', () => renderDashboard(language, session, profile));
+  document.querySelector('#resetLanguage').addEventListener('click', () => {
+    localStorage.removeItem(langKey);
+    route();
+  });
+  document.querySelector('#logout').addEventListener('click', () => {
+    localStorage.removeItem(sessionKey);
+    localStorage.removeItem(profileKey);
+    route();
   });
 }
 
-function render() {
-  const user = getUser();
-  if (!user) {
-    renderLogin();
-    return;
-  }
-  renderChat(user);
-}
-
-render();
+route();
