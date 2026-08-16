@@ -1,6 +1,6 @@
 import './styles.css';
 
-const appVersion = '0.5.0-demo';
+const appVersion = '0.6.0-demo';
 const langKey = 'axynera_v04_language';
 const sessionKey = 'axynera_v04_session';
 const profileKey = 'axynera_v04_profile';
@@ -20,11 +20,11 @@ const languages = [
 ];
 
 const navTabs = [
-  { id: 'chat', label: 'Chat', icon: '●' },
-  { id: 'groups', label: 'Grup', icon: '◆' },
-  { id: 'status', label: 'Status', icon: '◉' },
-  { id: 'server', label: 'Server', icon: '▣' },
-  { id: 'calls', label: 'Panggilan', icon: '☎' }
+  { id: 'chat', label: 'Chat', icon: '✦' },
+  { id: 'groups', label: 'Grup', icon: '⬢' },
+  { id: 'status', label: 'Status', icon: '◌' },
+  { id: 'server', label: 'Server', icon: '▦' },
+  { id: 'calls', label: 'Panggilan', icon: '◍' }
 ];
 
 const badges = {
@@ -72,6 +72,7 @@ const permissionList = ['Camera', 'Mic', 'Location', 'Contacts', 'Storage', 'SMS
 let activeTab = 'chat';
 let showProfileModal = false;
 let showPermissionModal = false;
+let activeEntity = { type: 'me' };
 
 function safeJson(value) {
   try {
@@ -178,13 +179,34 @@ function badgeMarkup(list = []) {
   return `<span class="badge-line">${list.map((badge) => badges[badge]).join('')}</span>`;
 }
 
-function avatarMarkup(value, fallback = 'AX', className = '') {
+function avatarMarkup(value, fallback = 'AX', className = '', profileType = 'me', index = '') {
   const profile = typeof value === 'object' ? value : null;
+  const data = `data-profile-type="${profileType}" ${index !== '' ? `data-profile-index="${index}"` : ''}`;
   if (profile?.photo) {
-    return `<button class="avatar ${className}" data-profile-open="true"><img src="${profile.photo}" alt="${profile.name || 'Profile'}" /></button>`;
+    return `<button class="avatar ${className}" ${data}><img src="${profile.photo}" alt="${profile.name || 'Profile'}" /></button>`;
   }
   const label = profile?.avatar || value || fallback;
-  return `<button class="avatar ${className}" data-profile-open="true">${label}</button>`;
+  return `<button class="avatar ${className}" ${data}>${label}</button>`;
+}
+
+function miniIcon(label, symbol) {
+  return `<span class="app-icon" aria-label="${label}">${symbol}</span>`;
+}
+
+function resolveEntity(profile, type = 'me', index = 0) {
+  if (type === 'contact') {
+    return { type, ...chats[index], username: chats[index]?.name?.toLowerCase().replace(/\s+/g, '_') };
+  }
+  if (type === 'group') {
+    return { type, ...groups[index], username: 'group' };
+  }
+  if (type === 'server') {
+    return { type, ...servers[index], username: 'server' };
+  }
+  if (type === 'call') {
+    return { type: 'contact', ...calls[index], username: calls[index]?.name?.toLowerCase().replace(/\s+/g, '_') };
+  }
+  return { type: 'me', ...profile, badges: ['verify', 'dev', 'vip'] };
 }
 
 function logoMarkup() {
@@ -348,9 +370,10 @@ function renderProfileSetup(language, session) {
 }
 
 function renderRows(items, type = 'chat') {
-  return items.map((item) => `
+  const profileType = type === 'calls' ? 'call' : type === 'groups' ? 'group' : 'contact';
+  return items.map((item, index) => `
     <article class="list-item">
-      <button class="avatar">${item.avatar}</button>
+      ${avatarMarkup(item.avatar, 'AX', '', profileType, index)}
       <div>
         <strong>${item.name}${badgeMarkup(item.badges)}</strong>
         <p>${item.bio}</p>
@@ -366,12 +389,12 @@ function renderRows(items, type = 'chat') {
 
 function renderContent(profile) {
   if (activeTab === 'groups') {
-    return `<header class="page-title"><h2>Grup</h2><button>＋</button></header><section class="list-stack">${renderRows(groups)}</section>`;
+    return `<header class="page-title"><h2>Grup</h2><button>${miniIcon('Tambah grup', '+')}</button></header><section class="list-stack">${renderRows(groups, 'groups')}</section>`;
   }
   if (activeTab === 'status') {
     const activeStatuses = getActiveStatuses();
     return `
-      <header class="page-title"><h2>Status</h2><button>▣</button></header>
+      <header class="page-title"><h2>Status</h2><button>${miniIcon('Tambah status', '+')}</button></header>
       <section class="status-me">${avatarMarkup(profile, 'IP')}<div><strong>Status saya</strong><p>Demo status otomatis hilang setelah 24 jam</p></div><span>24j</span></section>
       <section class="status-grid">${activeStatuses.map((item) => `<article><span class="avatar">${item.avatar}</span><strong>${item.name}</strong><p>${item.title}</p><small>${item.meta} • tersisa ${Math.max(1, 24 - Math.floor((Date.now() - new Date(item.createdAt).getTime()) / (60 * 60 * 1000)))}j</small></article>`).join('')}</section>
       ${activeStatuses.length ? '' : '<p class="empty-note">Belum ada status aktif.</p>'}
@@ -379,13 +402,13 @@ function renderContent(profile) {
   }
   if (activeTab === 'server') {
     return `
-      <header class="page-title"><h2>Server</h2><button>＋</button></header>
-      <section class="server-grid">${servers.map((server) => `<article><span class="avatar">${server.avatar}</span><strong>${server.name}</strong><p>${server.bio}</p></article>`).join('')}</section>
+      <header class="page-title"><h2>Server</h2><button>${miniIcon('Tambah server', '+')}</button></header>
+      <section class="server-grid">${servers.map((server, index) => `<article data-profile-type="server" data-profile-index="${index}"><span class="avatar">${server.avatar}</span><strong>${server.name}</strong><p>${server.bio}</p></article>`).join('')}</section>
       <section class="channel-list">${servers[0].channels.map((channel) => `<button># ${channel}<span>DEV</span></button>`).join('')}</section>
     `;
   }
   if (activeTab === 'calls') {
-    return `<header class="page-title"><h2>Panggilan</h2><button>⋮</button></header><div class="segmented"><button class="active">Voice</button><button>Video</button></div><section class="list-stack">${renderRows(calls, 'calls')}</section>`;
+    return `<header class="page-title"><h2>Panggilan</h2><button>${miniIcon('Menu panggilan', '⋯')}</button></header><div class="segmented"><button class="active">Voice</button><button>Video</button></div><section class="list-stack">${renderRows(calls, 'calls')}</section>`;
   }
   return `
     <div class="segmented"><button class="active">Semua</button><button>Belum Dibaca</button><button>Favorit</button></div>
@@ -402,11 +425,11 @@ function renderDashboard(language, session, profile) {
           ${avatarMarkup(profile, 'IP', 'top-avatar')}
           <div><h1>Axynera</h1><p>${title} • ${profile.theme || 'Light'}</p></div>
         </div>
-        <div class="topbar-actions"><button>⌕</button><button id="settingsBtn">⚙</button></div>
+        <div class="topbar-actions"><button>${miniIcon('Cari', '⌕')}</button><button id="settingsBtn">${miniIcon('Pengaturan', '⚙')}</button></div>
       </header>
       <section class="content">${renderContent(profile)}</section>
       <nav class="bottom-nav">${navTabs.map((tab) => `<button class="${activeTab === tab.id ? 'active' : ''}" data-tab="${tab.id}"><span>${tab.icon}</span>${tab.label}</button>`).join('')}</nav>
-      ${showProfileModal ? renderProfileModal(profile) : ''}
+      ${showProfileModal ? renderProfileModal(resolveEntity(profile, activeEntity.type, activeEntity.index), profile) : ''}
       ${showPermissionModal ? renderPermissionModal() : ''}
     </main>
   `;
@@ -418,8 +441,10 @@ function renderDashboard(language, session, profile) {
       renderDashboard(language, session, profile);
     });
   });
-  document.querySelectorAll('[data-profile-open]').forEach((button) => {
-    button.addEventListener('click', () => {
+  document.querySelectorAll('[data-profile-type]').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      activeEntity = { type: button.dataset.profileType || 'me', index: Number(button.dataset.profileIndex || 0) };
       showProfileModal = true;
       renderDashboard(language, session, profile);
     });
@@ -445,19 +470,36 @@ function renderDashboard(language, session, profile) {
   });
 }
 
-function renderProfileModal(profile) {
+function renderProfileModal(entity, profile) {
+  const isMe = entity.type === 'me';
+  const isContact = entity.type === 'contact';
+  const isGroup = entity.type === 'group';
+  const isServer = entity.type === 'server';
+  const title = isMe ? profile.name : entity.name;
+  const subtitle = isMe ? `@${profile.username}` : isServer ? entity.bio : isGroup ? entity.meta : `@${entity.username}`;
+  const avatar = isMe ? avatarMarkup(profile, 'IP', 'profile-avatar') : `<span class="avatar profile-avatar">${entity.avatar}</span>`;
+  const badgeList = isMe ? ['verify', 'dev', 'vip'] : entity.badges || [];
+  const bio = isMe ? profile.bio : isServer ? 'Server komunitas Axynera.' : isGroup ? entity.bio : entity.bio;
+
   return `
     <div class="modal-shade">
-      <section class="profile-modal">
+      <section class="profile-modal ${isServer ? 'server-modal' : ''}">
         <button id="closeModal" class="close-button">×</button>
-        <div class="cover">${profile.cover ? `<img src="${profile.cover}" alt="Cover" />` : ''}</div>
-        ${avatarMarkup(profile, 'IP', 'profile-avatar')}
-        <h2>${profile.name}${badgeMarkup(['verify', 'dev', 'vip'])}</h2>
-        <p>@${profile.username}</p>
-        <small class="bio">${profile.bio}</small>
-        <div class="presence-card"><span>🎮 Playing</span><strong>Axynera Quest</strong></div>
-        <div class="presence-card"><span>♪ Listening</span><strong>Neon Drive</strong></div>
-        <div class="modal-actions"><button>Message</button><button>Call</button><button id="editProfile">Edit</button></div>
+        <div class="cover">${isMe && profile.cover ? `<img src="${profile.cover}" alt="Cover" />` : ''}</div>
+        ${avatar}
+        <h2>${title}${badgeMarkup(badgeList)}</h2>
+        <p>${subtitle}</p>
+        <small class="bio">${bio}</small>
+        ${isMe ? '<div class="presence-card"><span>Playing</span><strong>Axynera Quest</strong></div><div class="presence-card"><span>Listening</span><strong>Neon Drive</strong></div>' : ''}
+        ${isContact ? '<div class="presence-card"><span>Status</span><strong>Online demo</strong></div>' : ''}
+        ${isGroup ? '<div class="presence-card compact"><span>Grup</span><strong>Profile grup demo</strong></div>' : ''}
+        ${isServer ? '<div class="presence-card compact"><span>Server</span><strong>Profile server demo</strong></div>' : ''}
+        <div class="modal-actions ${isMe || isGroup || isServer ? 'single-action' : ''}">
+          ${isMe ? '<button id="editProfile">Edit Profile</button>' : ''}
+          ${isContact ? '<button>Message</button><button>Call</button><button>Info</button>' : ''}
+          ${isGroup ? '<button>Lihat Grup</button>' : ''}
+          ${isServer ? '<button>Buka Server</button>' : ''}
+        </div>
       </section>
     </div>
   `;
@@ -510,7 +552,8 @@ function renderSettings(language, session, profile) {
     showPermissionModal = true;
     renderDashboard(language, session, profile);
   });
-  document.querySelector('[data-profile-open]')?.addEventListener('click', () => {
+  document.querySelector('[data-profile-type]')?.addEventListener('click', () => {
+    activeEntity = { type: 'me' };
     showProfileModal = true;
     renderDashboard(language, session, profile);
   });
