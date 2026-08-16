@@ -612,11 +612,23 @@ button { border: 0; cursor: pointer; }
 
 .status-me {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   gap: 12px;
   align-items: center;
   padding: 10px 14px;
   border-bottom: 1px solid #edf2ff;
+}
+
+.status-me > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 30px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--blue);
+  font-size: 12px;
+  font-weight: 950;
 }
 
 .status-grid,
@@ -641,6 +653,18 @@ button { border: 0; cursor: pointer; }
   color: var(--muted);
   margin: 6px 0;
   font-size: 12px;
+}
+
+.status-grid small {
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.empty-note {
+  margin: 26px 14px;
+  color: var(--muted);
+  text-align: center;
 }
 
 .channel-list {
@@ -681,6 +705,67 @@ button { border: 0; cursor: pointer; }
   background: #fff;
   box-shadow: 0 28px 70px rgba(15, 23, 42, 0.24);
   text-align: center;
+}
+
+.permission-modal {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: min(100%, 420px);
+  padding: 22px 18px 16px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.24);
+  text-align: center;
+}
+
+.permission-modal h2 {
+  margin: 0;
+}
+
+.permission-modal p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.permission-modal small {
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.permission-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.permission-grid span {
+  padding: 10px 8px;
+  border: 1px solid #cfe0ff;
+  border-radius: 12px;
+  color: var(--blue);
+  background: #f5f9ff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.permission-actions {
+  width: 100%;
+}
+
+.permission-actions button:last-child {
+  color: #fff;
+  border-color: transparent;
+  background: var(--blue);
+}
+
+.permission-actions button:disabled {
+  opacity: 0.7;
 }
 
 .cover {
