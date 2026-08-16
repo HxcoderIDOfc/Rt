@@ -38,9 +38,39 @@ jobs:
       - name: Ensure Android permissions
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
-          if ! grep -q 'android.permission.INTERNET' "$MANIFEST"; then
-            sed -i 's#<application#    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.READ_CONTACTS" />\n    <uses-permission android:name="android.permission.WRITE_CONTACTS" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    <uses-permission android:name="android.permission.SEND_SMS" />\n    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />\n    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />\n    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />\n    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n\n    <application#' "$MANIFEST"
-          fi
+          python - <<'PY'
+          from pathlib import Path
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          text = manifest.read_text()
+          permissions = [
+              '<uses-permission android:name="android.permission.INTERNET" />',
+              '<uses-permission android:name="android.permission.CAMERA" />',
+              '<uses-permission android:name="android.permission.RECORD_AUDIO" />',
+              '<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />',
+              '<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />',
+              '<uses-permission android:name="android.permission.READ_CONTACTS" />',
+              '<uses-permission android:name="android.permission.WRITE_CONTACTS" />',
+              '<uses-permission android:name="android.permission.READ_SMS" />',
+              '<uses-permission android:name="android.permission.SEND_SMS" />',
+              '<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />',
+              '<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />',
+              '<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />',
+              '<uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />',
+              '<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />',
+              '<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />',
+          ]
+
+          missing = []
+          for line in permissions:
+              name = line.split('android:name="', 1)[1].split('"', 1)[0]
+              if name not in text:
+                  missing.append(f"    {line}")
+
+          if missing:
+              text = text.replace("    <application", "\n".join(missing) + "\n\n    <application", 1)
+              manifest.write_text(text)
+          PY
           grep 'android.permission' "$MANIFEST"
 
       - name: Sync Capacitor
