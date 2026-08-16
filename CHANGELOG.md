@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.0-demo
+
+- Added a permission center popup after entering the app.
+- Added runtime permission requests for notifications, camera, microphone, and location where supported.
+- Added Android-ready permission notes for contacts, storage, and SMS.
+- Added demo status cards that automatically expire after 24 hours.
+- Renamed the debug APK artifact to `axynera-v0.5-demo-debug-apk`.
+
 ## v0.4.0-demo
 
 - Changed the default theme to Light Blue/Cyan.
