@@ -39,7 +39,6 @@ jobs:
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           if ! grep -q 'android.permission.INTERNET' "$MANIFEST"; then
-            sed -i 's#<manifest #<manifest xmlns:android="http://schemas.android.com/apk/res/android" #' "$MANIFEST"
             sed -i 's#<application#    <uses-permission android:name="android.permission.INTERNET" />\n\n    <application#' "$MANIFEST"
           fi
           grep 'android.permission.INTERNET' "$MANIFEST"
