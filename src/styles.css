@@ -63,7 +63,6 @@ button {
 .splash-card,
 .setup-card,
 .phone-preview,
-.profile-strip,
 .content-panel,
 .settings-card,
 .bottom-nav {
@@ -355,8 +354,8 @@ button {
   height: 100dvh;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
-  gap: 12px;
-  padding: 14px;
+  gap: 0;
+  padding: 0;
   overflow: hidden;
   background: #efeae2;
 }
@@ -366,15 +365,34 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin: -14px -14px 0;
-  padding: 16px 14px 14px;
+  min-height: 92px;
+  padding: max(28px, env(safe-area-inset-top)) 14px 12px;
   color: #fff;
-  background: linear-gradient(135deg, #075e54, #128c7e);
-  box-shadow: 0 14px 30px rgba(7, 94, 84, 0.22);
+  background: #075e54;
+  box-shadow: none;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+}
+
+.topbar-brand .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .app-topbar h1 {
-  font-size: 32px;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.app-topbar .eyebrow {
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .topbar-actions {
@@ -383,30 +401,33 @@ button {
 }
 
 .icon-button {
-  min-height: 42px;
-  padding: 0 13px;
-  color: #075e54;
-  background: rgba(255, 255, 255, 0.9);
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
   box-shadow: none;
+  font-size: 12px;
 }
 
-.profile-strip {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+.account-line {
+  display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 13px;
-  border-radius: 22px;
-  background: #ffffff;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  color: #31544c;
+  background: #e7f3ef;
+  border-bottom: 1px solid rgba(7, 94, 84, 0.08);
+  font-size: 13px;
 }
 
-.profile-strip strong,
+.account-line strong,
 .list-item strong,
 .settings-card strong {
   color: #10201c;
 }
 
-.profile-strip p,
 .list-item p,
 .settings-card p {
   margin: 3px 0 0;
@@ -415,21 +436,25 @@ button {
   white-space: nowrap;
 }
 
-.profile-strip > span {
-  padding: 8px 10px;
+.account-line small {
+  margin-left: auto;
+  padding: 5px 8px;
   border-radius: 999px;
   color: #0b7e5d;
-  background: rgba(16, 185, 129, 0.12);
-  font-size: 12px;
+  background: rgba(18, 140, 126, 0.12);
+  font-size: 11px;
   font-weight: 900;
 }
 
 .content-panel {
   min-height: 0;
   overflow: auto;
-  border-radius: 16px;
+  border: 0;
+  border-radius: 0;
   padding: 0;
   background: #ffffff;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .list-stack {
@@ -444,7 +469,8 @@ button {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  padding: 13px 14px;
+  min-height: 74px;
+  padding: 10px 14px;
   border-radius: 0;
   background: #ffffff;
   border-bottom: 1px solid rgba(7, 94, 84, 0.08);
@@ -471,13 +497,13 @@ button {
 .avatar {
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
   overflow: hidden;
   color: #fff;
   font-weight: 950;
-  background: linear-gradient(135deg, #10b981, #3b82f6);
+  background: linear-gradient(135deg, #00a884, #128c7e);
 }
 
 .avatar.image {
@@ -487,36 +513,41 @@ button {
 .bottom-nav {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 6px;
-  padding: 8px;
-  border-radius: 18px;
+  gap: 0;
+  padding: 4px 6px max(6px, env(safe-area-inset-bottom));
+  border: 0;
+  border-top: 1px solid rgba(7, 94, 84, 0.1);
+  border-radius: 0;
   background: #ffffff;
+  box-shadow: 0 -8px 24px rgba(7, 94, 84, 0.06);
+  backdrop-filter: none;
 }
 
 .bottom-nav button {
   display: grid;
   place-items: center;
-  gap: 3px;
-  min-height: 58px;
-  border-radius: 18px;
+  gap: 2px;
+  min-height: 50px;
+  border-radius: 12px;
   color: #63766f;
   background: transparent;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
 }
 
 .bottom-nav span {
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 9px;
-  background: rgba(16, 185, 129, 0.1);
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: #7b9088;
+  background: transparent;
 }
 
 .bottom-nav button.active {
   color: #075e54;
-  background: rgba(18, 140, 126, 0.1);
+  background: transparent;
 }
 
 .bottom-nav button.active span {
@@ -630,40 +661,31 @@ button {
   }
 
   .mobile-shell {
-    padding: 10px;
-    gap: 10px;
+    padding: 0;
+    gap: 0;
   }
 
   .app-topbar {
-    margin: -10px -10px 0;
-    padding: 14px 10px 12px;
+    min-height: 88px;
+    padding: max(26px, env(safe-area-inset-top)) 12px 10px;
   }
 
   .app-topbar h1 {
-    font-size: 28px;
+    font-size: 25px;
   }
 
   .icon-button {
-    min-height: 38px;
-    padding: 0 10px;
+    min-height: 32px;
+    padding: 0 9px;
     font-size: 12px;
   }
 
-  .profile-strip {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .profile-strip > span {
-    grid-column: 2;
-    width: fit-content;
-  }
-
   .bottom-nav {
-    border-radius: 20px;
+    border-radius: 0;
   }
 
   .bottom-nav button {
-    min-height: 54px;
+    min-height: 50px;
     font-size: 10px;
   }
 }
