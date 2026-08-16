@@ -1,13 +1,14 @@
-# Axynera v0.1
+# Axynera Chat Demo
 
-Versi awal untuk app Axynera:
+Versi demo untuk app chat Axynera:
 
 - Vite untuk UI web.
 - Capacitor untuk bungkus jadi APK Android.
 - Package Android: `com.axynera.official`.
 - Permission Android awal: `android.permission.INTERNET`.
-- Login Google dummy, sekali klik langsung masuk dashboard.
-- Backend Cloudflare Worker bisa disambungkan nanti.
+- Login email/password demo.
+- UI chat bergaya server/channel + direct message.
+- Slot AI siap disambungkan ke Cloudflare Worker.
 - Build APK manual lewat GitHub Actions.
 
 ## Jalankan web
@@ -39,13 +40,15 @@ npm run cap:open
 
 ## Nanti disambungkan ke Cloudflare Worker
 
-Tombol dummy di `src/main.js` bisa diganti ke endpoint:
+Login dan chat demo di `src/main.js` bisa diganti ke endpoint:
 
 ```text
-https://api.axynera.my.id/auth/google
+https://api.axynera.my.id/auth/login
+https://api.axynera.my.id/messages
+https://api.axynera.my.id/ai/chat
 ```
 
-Untuk sekarang tombol Google hanya menyimpan user dummy ke `localStorage`.
+Untuk sekarang login hanya menyimpan user demo ke `localStorage`.
 
 ## Build APK di GitHub
 
@@ -57,7 +60,7 @@ Cara pakai:
 2. Buka tab **Actions**.
 3. Pilih **Build Android APK**.
 4. Klik **Run workflow**.
-5. Download artifact bernama `axynera-v0.1-debug-apk`.
+5. Download artifact bernama `axynera-v0.2-demo-debug-apk`.
 
 File APK debug akan dibuat dari:
 
@@ -66,6 +69,13 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Changelog
+
+### v0.2.0-demo
+
+- Mengubah app menjadi demo chat bergaya Discord/WA.
+- Menambahkan login email/password demo.
+- Menambahkan server rail, channel list, direct message, chat room, composer, dan panel AI.
+- Menyiapkan placeholder endpoint Cloudflare Worker untuk login, pesan, dan AI.
 
 ### v0.1.0
 
