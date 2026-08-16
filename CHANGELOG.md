@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.7.0-demo
+
+- Added refreshed icons for Chat, Groups, Status, Server, and Calls.
+- Changed Status and Server content into vertical chat-style lists.
+- Removed the theme label from the topbar and added a three-dot menu.
+- Added a floating contacts panel with registered or invite states.
+- Refined profile setup with a large thumbnail and overlapping avatar.
+- Added fuller Settings and an Admin demo panel.
+- Added permanent ban, time ban, and unban options in the Admin demo.
+- Renamed the debug APK artifact to `axynera-v0.7-demo-debug-apk`.
+
 ## v0.6.0-demo
 
 - Changed the profile modal so the user's own profile only shows edit actions.
