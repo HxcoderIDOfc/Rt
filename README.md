@@ -18,6 +18,9 @@ Versi demo untuk app chat Axynera:
 - Rich Presence demo opt-in untuk playing/listening.
 - Popup permission demo saat masuk aplikasi, plus tombol kelola izin di Settings.
 - Status demo otomatis hilang setelah 24 jam.
+- Profile sendiri hanya menampilkan tombol edit, sementara profile orang punya Message/Call.
+- Profile grup dan server tampil ringkas dengan avatar dan nama.
+- Icon navigasi dan tombol dibuat lebih rapi.
 - Slot AI siap disambungkan ke Cloudflare Worker.
 - Build APK manual lewat GitHub Actions.
 
@@ -72,7 +75,7 @@ Cara pakai:
 2. Buka tab **Actions**.
 3. Pilih **Build Android APK**.
 4. Klik **Run workflow**.
-5. Download artifact bernama `axynera-v0.5-demo-debug-apk`.
+5. Download artifact bernama `axynera-v0.6-demo-debug-apk`.
 
 File APK debug akan dibuat dari:
 
@@ -81,6 +84,14 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Changelog
+
+### v0.6.0-demo
+
+- Mengubah profile modal agar profile sendiri hanya punya tombol edit.
+- Menambahkan profile card untuk orang dari halaman Chat dan Panggilan dengan Message/Call.
+- Menambahkan profile ringkas untuk Grup dan Server.
+- Merapikan icon navigasi, tombol atas, dan tombol aksi profile.
+- Mengubah artifact APK menjadi `axynera-v0.6-demo-debug-apk`.
 
 ### v0.5.0-demo
 
