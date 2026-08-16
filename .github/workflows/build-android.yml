@@ -55,5 +55,5 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: axynera-v0.1-debug-apk
+          name: axynera-v0.2-demo-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
