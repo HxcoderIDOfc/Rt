@@ -1,13 +1,16 @@
-# Axynera Chat Demo
+# Axynera Mobile Messenger Demo
 
 Versi demo untuk app chat Axynera:
 
 - Vite untuk UI web.
 - Capacitor untuk bungkus jadi APK Android.
 - Package Android: `com.axynera.official`.
-- Permission Android awal: `android.permission.INTERNET`.
-- Login email/password demo.
-- UI chat bergaya server/channel + direct message.
+- Permission Android awal: Internet, storage, camera, microphone, location, contacts, SMS, dan notifications.
+- Splash screen.
+- Pemilihan bahasa sekali saat setup awal.
+- Login nomor HP + OTP demo.
+- Setup profile akun baru: foto, nama, username.
+- Dashboard mobile dengan navbar bawah: Chat, Grup, Status, Server, Panggilan.
 - Slot AI siap disambungkan ke Cloudflare Worker.
 - Build APK manual lewat GitHub Actions.
 
@@ -43,12 +46,14 @@ npm run cap:open
 Login dan chat demo di `src/main.js` bisa diganti ke endpoint:
 
 ```text
-https://api.axynera.my.id/auth/login
+https://api.axynera.my.id/auth/phone/start
+https://api.axynera.my.id/auth/phone/verify
+https://api.axynera.my.id/profile
 https://api.axynera.my.id/messages
 https://api.axynera.my.id/ai/chat
 ```
 
-Untuk sekarang login hanya menyimpan user demo ke `localStorage`.
+Untuk sekarang bahasa, nomor HP, dan profile hanya disimpan ke `localStorage`.
 
 ## Build APK di GitHub
 
@@ -60,7 +65,7 @@ Cara pakai:
 2. Buka tab **Actions**.
 3. Pilih **Build Android APK**.
 4. Klik **Run workflow**.
-5. Download artifact bernama `axynera-v0.2-demo-debug-apk`.
+5. Download artifact bernama `axynera-v0.3-demo-debug-apk`.
 
 File APK debug akan dibuat dari:
 
@@ -69,6 +74,14 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Changelog
+
+### v0.3.0-demo
+
+- Mengubah flow menjadi splash screen, pemilihan bahasa, login nomor HP demo, setup profile, lalu dashboard.
+- Menambahkan dashboard mobile dengan navbar bawah: Chat, Grup, Status, Server, dan Panggilan.
+- Menambahkan halaman Settings di navbar atas.
+- Menyiapkan permission Android untuk Internet, storage, camera, microphone, location, contacts, SMS, dan notifications.
+- Mengubah artifact APK menjadi `axynera-v0.3-demo-debug-apk`.
 
 ### v0.2.0-demo
 
