@@ -35,13 +35,13 @@ jobs:
       - name: Generate Android project
         run: npx cap add android
 
-      - name: Ensure Android internet permission
+      - name: Ensure Android permissions
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           if ! grep -q 'android.permission.INTERNET' "$MANIFEST"; then
-            sed -i 's#<application#    <uses-permission android:name="android.permission.INTERNET" />\n\n    <application#' "$MANIFEST"
+            sed -i 's#<application#    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.READ_CONTACTS" />\n    <uses-permission android:name="android.permission.WRITE_CONTACTS" />\n    <uses-permission android:name="android.permission.READ_SMS" />\n    <uses-permission android:name="android.permission.SEND_SMS" />\n    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />\n    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />\n    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />\n    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n\n    <application#' "$MANIFEST"
           fi
-          grep 'android.permission.INTERNET' "$MANIFEST"
+          grep 'android.permission' "$MANIFEST"
 
       - name: Sync Capacitor
         run: npx cap sync android
@@ -55,5 +55,5 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: axynera-v0.2-demo-debug-apk
+          name: axynera-v0.3-demo-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
