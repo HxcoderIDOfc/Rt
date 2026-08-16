@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.4.0-demo
+
+- Changed the default theme to Light Blue/Cyan.
+- Added CSS-based AX logo, light splash, and refreshed onboarding screens.
+- Added demo profile picture and cover/thumbnail uploads with image/GIF support.
+- Added mini Verify, Dev, and VIP badges inline after names.
+- Added floating profile modal opened from the avatar.
+- Added fuller Chat, Group, Status, Server, Calls, and Settings pages.
+- Added opt-in Rich Presence demo for playing/listening states.
+- Renamed the debug APK artifact to `axynera-v0.4-demo-debug-apk`.
+
 ## v0.3.0-demo
 
 - Changed the app flow to splash screen, one-time language selection, demo phone login, profile setup, and dashboard.
