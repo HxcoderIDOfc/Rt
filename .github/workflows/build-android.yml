@@ -29,11 +29,33 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Decode brand assets
+        run: |
+          mkdir -p public/assets/brand
+          base64 -d public/assets/brand/axynera-navbar-logo.png.b64 > public/assets/brand/axynera-navbar-logo.png
+          base64 -d public/assets/brand/axynera-splash-loading.png.b64 > public/assets/brand/axynera-splash-loading.png
+          base64 -d public/assets/brand/axynera-app-icon-ax.png.b64 > public/assets/brand/axynera-app-icon-ax.png
+
       - name: Build web app
         run: npm run build
 
       - name: Generate Android project
         run: npx cap add android
+
+      - name: Apply AX launcher icon
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          mkdir -p android/app/src/main/res/mipmap-mdpi \
+            android/app/src/main/res/mipmap-hdpi \
+            android/app/src/main/res/mipmap-xhdpi \
+            android/app/src/main/res/mipmap-xxhdpi \
+            android/app/src/main/res/mipmap-xxxhdpi
+          convert public/assets/brand/axynera-app-icon-ax.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          convert public/assets/brand/axynera-app-icon-ax.png -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          convert public/assets/brand/axynera-app-icon-ax.png -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          convert public/assets/brand/axynera-app-icon-ax.png -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          convert public/assets/brand/axynera-app-icon-ax.png -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
       - name: Ensure Android permissions
         run: |
