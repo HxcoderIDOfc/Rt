@@ -28,6 +28,8 @@ Versi demo untuk app chat Axynera:
 - Floating kontak bisa menampilkan kontak terdaftar atau tombol undang.
 - Edit profile memakai thumbnail besar dengan PP bertumpuk.
 - Asset brand transparan untuk navbar, splash/loading, dan app icon AX.
+- Navbar memakai logo horizontal Axynera di kiri dan PP user di kanan dekat titik tiga.
+- Launcher icon AX diterapkan setelah Capacitor sync agar tidak ketimpa bawaan.
 - Slot AI siap disambungkan ke Cloudflare Worker.
 - Build APK manual lewat GitHub Actions.
 
@@ -82,7 +84,7 @@ Cara pakai:
 2. Buka tab **Actions**.
 3. Pilih **Build Android APK**.
 4. Klik **Run workflow**.
-5. Download artifact bernama `axynera-v0.7-demo-debug-apk`.
+5. Download artifact bernama `axynera-v0.8-demo-debug-apk`.
 
 File APK debug akan dibuat dari:
 
@@ -91,6 +93,14 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Changelog
+
+### v0.8.0-demo
+
+- Memasang logo horizontal Axynera penuh di navbar kiri.
+- Memindahkan PP user ke kanan dekat tombol titik tiga.
+- Memindahkan proses launcher icon setelah Capacitor sync agar icon AX tidak ketimpa bawaan.
+- Menambahkan launcher icon normal, round, dan foreground untuk Android.
+- Mengubah artifact APK menjadi `axynera-v0.8-demo-debug-apk`.
 
 ### v0.7.0-demo
 
