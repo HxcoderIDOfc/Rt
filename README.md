@@ -30,6 +30,8 @@ Versi demo untuk app chat Axynera:
 - Asset brand transparan untuk navbar, splash/loading, dan app icon AX.
 - Navbar memakai logo horizontal Axynera di kiri dan PP user di kanan dekat titik tiga.
 - Launcher icon AX diterapkan setelah Capacitor sync agar tidak ketimpa bawaan.
+- Icon navbar bawah diperbesar agar lebih jelas di Android.
+- Launcher icon Android diberi padding agar logo AX tidak terlalu besar.
 - APK debug memakai stable signing key demo agar update berikutnya tidak bentrok tanda tangan.
 - Slot AI siap disambungkan ke Cloudflare Worker.
 - Build APK manual lewat GitHub Actions.
@@ -85,7 +87,7 @@ Cara pakai:
 2. Buka tab **Actions**.
 3. Pilih **Build Android APK**.
 4. Klik **Run workflow**.
-5. Download artifact bernama `axynera-v0.9-demo-debug-apk`.
+5. Download artifact bernama `axynera-v0.10-demo-debug-apk`.
 
 File APK debug akan dibuat dari:
 
@@ -94,6 +96,12 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Changelog
+
+### v0.10.0-demo
+
+- Memperbesar icon navbar bawah agar lebih nyaman dilihat di Android.
+- Mengecilkan logo AX di launcher icon dengan padding canvas.
+- Mengubah artifact APK menjadi `axynera-v0.10-demo-debug-apk`.
 
 ### v0.9.0-demo
 
