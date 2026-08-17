@@ -27,6 +27,7 @@ Versi demo untuk app chat Axynera:
 - Admin demo mendukung pilihan ban permanent, time ban, dan unban.
 - Floating kontak bisa menampilkan kontak terdaftar atau tombol undang.
 - Edit profile memakai thumbnail besar dengan PP bertumpuk.
+- Asset brand transparan untuk navbar, splash/loading, dan app icon AX.
 - Slot AI siap disambungkan ke Cloudflare Worker.
 - Build APK manual lewat GitHub Actions.
 
