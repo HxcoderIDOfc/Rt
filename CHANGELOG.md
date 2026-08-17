@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.8.0-demo
+
+- Installed the full horizontal Axynera logo on the left side of the navbar.
+- Moved the user avatar to the right side near the three-dot menu.
+- Moved launcher icon generation after Capacitor sync so the AX icon is not overwritten.
+- Added normal, round, and foreground Android launcher icon outputs.
+- Renamed the debug APK artifact to `axynera-v0.8-demo-debug-apk`.
+
 ## v0.7.0-demo
 
 - Added refreshed icons for Chat, Groups, Status, Server, and Calls.
