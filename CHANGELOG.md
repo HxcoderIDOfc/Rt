@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.0-demo
+
+- Added a stable demo debug signing key for GitHub Actions APK builds.
+- Installed the stable debug keystore before Gradle assembles the debug APK.
+- Updated GitHub Actions to newer Node 24 compatible action versions.
+- Renamed the debug APK artifact to `axynera-v0.9-demo-debug-apk`.
+
 ## v0.8.0-demo
 
 - Installed the full horizontal Axynera logo on the left side of the navbar.
