@@ -1,6 +1,6 @@
 import './styles.css';
 
-const appVersion = '0.7.0-demo';
+const appVersion = '0.8.0-demo';
 const langKey = 'axynera_v04_language';
 const sessionKey = 'axynera_v04_session';
 const profileKey = 'axynera_v04_profile';
@@ -451,11 +451,15 @@ function renderDashboard(language, session, profile) {
   app.innerHTML = `
     <main class="app-shell">
       <header class="topbar">
-        <div class="topbar-left">
-          ${avatarMarkup(profile, 'IP', 'top-avatar')}
-          <div class="topbar-brand">${iconMarkup('topbar-icon')}<div><h1>Axynera</h1><p>${title}</p></div></div>
+        <div class="topbar-left topbar-logo-lockup">
+          ${logoMarkup()}
+          <p>${title}</p>
         </div>
-        <div class="topbar-actions"><button>${miniIcon('Cari', '⌕')}</button><button id="settingsBtn">${miniIcon('Menu', '⋮')}</button></div>
+        <div class="topbar-actions">
+          <button>${miniIcon('Cari', '⌕')}</button>
+          ${avatarMarkup(profile, 'IP', 'top-avatar')}
+          <button id="settingsBtn">${miniIcon('Menu', '⋮')}</button>
+        </div>
       </header>
       <section class="content">${renderContent(profile)}</section>
       <button id="contactsFab" class="contacts-fab">${miniIcon('Kontak', '+')}</button>
