@@ -64,7 +64,11 @@ function injectChatStyles() {
       background: linear-gradient(180deg, #f7faff 0%, #edf5ff 100%);
       color: #17213a;
       font-family: inherit;
+      pointer-events: auto;
     }
+    .axy-chat-room button,
+    .axy-chat-room textarea,
+    .axy-chat-room input { pointer-events: auto; }
     .axy-chat-topbar {
       min-height: 66px;
       padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
@@ -240,7 +244,6 @@ function renderMessages(container, index) {
 function closeChatRoom() {
   document.querySelector('.axy-chat-room')?.remove();
   activeChatRoom = null;
-  history.replaceState({ axyChat: false }, '', location.href);
 }
 
 function toggleAiPanel(room) {
@@ -297,7 +300,6 @@ function openChatRoom(index) {
     </footer>
   `;
   document.body.appendChild(room);
-  history.pushState({ axyChat: true }, '', location.href);
 
   const messages = room.querySelector('.axy-chat-messages');
   renderMessages(messages, index);
@@ -342,21 +344,24 @@ function openChatRoom(index) {
 injectChatStyles();
 
 document.addEventListener('click', (event) => {
-  if (event.target.closest('.axy-chat-room')) return;
+  if (document.querySelector('.axy-chat-room')) return;
+  if (event.target.closest('button, input, textarea, select, a, [data-profile-type]')) return;
+
   const item = event.target.closest('.content .list-stack .list-item');
   if (!item) return;
-  const content = document.querySelector('.content');
-  const segmented = content?.querySelector('.segmented');
+
+  const content = item.closest('.content');
+  if (!content) return;
+  const segmented = content.querySelector('.segmented');
   const isChatTab = segmented?.querySelector('button.active')?.textContent?.trim() === 'Semua';
   if (!isChatTab) return;
+
   const items = [...content.querySelectorAll('.list-stack .list-item')];
   const index = items.indexOf(item);
   if (index < 0 || index >= CHAT_USERS.length) return;
-  if (event.target.closest('[data-profile-type]')) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
+
   openChatRoom(index);
-}, true);
+});
 
 window.addEventListener('popstate', () => {
   if (activeChatRoom !== null) closeChatRoom();
