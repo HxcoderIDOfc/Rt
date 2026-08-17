@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.11.0-demo
+
+- Enlarged the bottom navbar icons again for clearer Android display.
+- Reduced the Android launcher AX mark again with larger transparent padding.
+- Renamed the debug APK artifact to `axynera-v0.11-demo-debug-apk`.
+
 ## v0.10.0-demo
 
 - Enlarged the bottom navbar icons for better Android readability.
