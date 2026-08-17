@@ -7,6 +7,11 @@ const profileKey = 'axynera_v04_profile';
 const permissionKey = 'axynera_v05_permissions_seen';
 const statusKey = 'axynera_v05_statuses';
 const dayMs = 24 * 60 * 60 * 1000;
+const brandAssets = {
+  navbar: '/assets/brand/axynera-navbar-logo.png',
+  splash: '/assets/brand/axynera-splash-loading.png',
+  icon: '/assets/brand/axynera-app-icon-ax.png'
+};
 
 const app = document.querySelector('#app');
 
@@ -229,7 +234,11 @@ function resolveEntity(profile, type = 'me', index = 0) {
 }
 
 function logoMarkup() {
-  return '<div class="ax-logo"><span>A</span><span>X</span></div>';
+  return `<img class="brand-logo-img" src="${brandAssets.navbar}" alt="Axynera" />`;
+}
+
+function iconMarkup(className = '') {
+  return `<img class="brand-icon-img ${className}" src="${brandAssets.icon}" alt="AX" />`;
 }
 
 function render() {
@@ -258,8 +267,7 @@ function renderSplash(next) {
     <main class="screen splash-screen">
       <div class="bubble-pattern"></div>
       <section class="splash-center">
-        ${logoMarkup()}
-        <h1>Axynera</h1>
+        <img class="splash-logo-img" src="${brandAssets.splash}" alt="Axynera loading" />
         <p>Terhubung. Aman. Fleksibel.</p>
         <div class="loading-bar"><span></span></div>
       </section>
@@ -445,7 +453,7 @@ function renderDashboard(language, session, profile) {
       <header class="topbar">
         <div class="topbar-left">
           ${avatarMarkup(profile, 'IP', 'top-avatar')}
-          <div><h1>Axynera</h1><p>${title}</p></div>
+          <div class="topbar-brand">${iconMarkup('topbar-icon')}<div><h1>Axynera</h1><p>${title}</p></div></div>
         </div>
         <div class="topbar-actions"><button>${miniIcon('Cari', '⌕')}</button><button id="settingsBtn">${miniIcon('Menu', '⋮')}</button></div>
       </header>
