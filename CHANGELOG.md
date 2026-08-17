@@ -7,6 +7,7 @@
 - Removed the theme label from the topbar and added a three-dot menu.
 - Added a floating contacts panel with registered or invite states.
 - Refined profile setup with a large thumbnail and overlapping avatar.
+- Added transparent brand assets for the navbar, splash/loading screen, and AX app icon.
 - Added fuller Settings and an Admin demo panel.
 - Added permanent ban, time ban, and unban options in the Admin demo.
 - Renamed the debug APK artifact to `axynera-v0.7-demo-debug-apk`.
