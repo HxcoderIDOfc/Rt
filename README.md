@@ -87,7 +87,7 @@ Cara pakai:
 2. Buka tab **Actions**.
 3. Pilih **Build Android APK**.
 4. Klik **Run workflow**.
-5. Download artifact bernama `axynera-v0.10-demo-debug-apk`.
+5. Download artifact bernama `axynera-v0.11-demo-debug-apk`.
 
 File APK debug akan dibuat dari:
 
@@ -96,6 +96,12 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Changelog
+
+### v0.11.0-demo
+
+- Memperbesar lagi icon navbar bawah agar lebih jelas di layar Android.
+- Mengecilkan lagi logo AX di launcher icon Android agar lebih rapi.
+- Mengubah artifact APK menjadi `axynera-v0.11-demo-debug-apk`.
 
 ### v0.10.0-demo
 
