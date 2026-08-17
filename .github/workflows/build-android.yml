@@ -92,21 +92,28 @@ jobs:
             android/app/src/main/res/mipmap-xhdpi \
             android/app/src/main/res/mipmap-xxhdpi \
             android/app/src/main/res/mipmap-xxxhdpi
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 108x108 android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 162x162 android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 216x216 android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 324x324 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-          convert public/assets/brand/axynera-app-icon-ax.png -resize 432x432 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
+          make_icon() {
+            src="$1"
+            canvas="$2"
+            inner="$3"
+            out="$4"
+            convert "$src" -resize "${inner}x${inner}" -background none -gravity center -extent "${canvas}x${canvas}" "$out"
+          }
+          make_icon public/assets/brand/axynera-app-icon-ax.png 48 36 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 48 36 android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 108 78 android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 72 54 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 72 54 android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 162 118 android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 96 72 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 96 72 android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 216 156 android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 144 108 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 144 108 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 324 234 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 192 144 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 192 144 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+          make_icon public/assets/brand/axynera-app-icon-ax.png 432 312 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
 
       - name: Install stable debug keystore
         run: |
@@ -124,5 +131,5 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7
         with:
-          name: axynera-v0.9-demo-debug-apk
+          name: axynera-v0.10-demo-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
