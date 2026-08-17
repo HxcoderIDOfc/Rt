@@ -67,31 +67,27 @@ button { border: 0; cursor: pointer; }
   text-align: center;
 }
 
-.ax-logo {
-  position: relative;
-  display: inline-grid;
-  grid-auto-flow: column;
-  gap: 0;
-  align-items: center;
-  font-size: 84px;
-  line-height: 0.8;
-  font-weight: 1000;
-  letter-spacing: -0.12em;
+.brand-logo-img,
+.splash-logo-img,
+.brand-icon-img {
+  display: block;
+  object-fit: contain;
 }
 
-.ax-logo span:first-child {
-  color: var(--blue);
-  text-shadow: 0 18px 44px rgba(37, 99, 235, 0.28);
+.splash-logo-img {
+  width: min(92vw, 420px);
+  max-height: 420px;
+  filter: drop-shadow(0 22px 42px rgba(37, 99, 235, 0.22));
 }
 
-.ax-logo span:last-child {
-  color: var(--cyan);
-  transform: translateX(-4px);
+.brand-logo-img {
+  width: min(68vw, 240px);
+  height: 44px;
 }
 
-.splash-center h1 {
-  margin: 0;
-  font-size: 38px;
+.brand-icon-img {
+  width: 42px;
+  height: 42px;
 }
 
 .splash-center p,
@@ -400,6 +396,19 @@ button { border: 0; cursor: pointer; }
   align-items: center;
   min-width: 0;
   gap: 11px;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.topbar-icon {
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 8px 14px rgba(37, 99, 235, 0.16));
 }
 
 .topbar h1 {
