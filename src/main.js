@@ -1,6 +1,6 @@
 import './styles.css';
 
-const appVersion = '0.8.0-demo';
+const appVersion = '0.9.0-demo';
 const langKey = 'axynera_v04_language';
 const sessionKey = 'axynera_v04_session';
 const profileKey = 'axynera_v04_profile';
