@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.10.0-demo
+
+- Enlarged the bottom navbar icons for better Android readability.
+- Added launcher icon padding so the AX mark is not oversized on Android.
+- Renamed the debug APK artifact to `axynera-v0.10-demo-debug-apk`.
+
 ## v0.9.0-demo
 
 - Added a stable demo debug signing key for GitHub Actions APK builds.
