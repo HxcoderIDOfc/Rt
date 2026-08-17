@@ -1,4 +1,5 @@
 const PROFILE_KEY = 'axynera_v04_profile';
+let profileEditorHistoryActive = false;
 
 function getProfile() {
   try {
@@ -57,6 +58,7 @@ function injectStyles() {
       margin-bottom: 18px;
     }
     .settings-profile-editor-head h2 { margin: 0; font-size: 20px; }
+    .settings-profile-editor-back,
     .settings-profile-editor-close {
       width: 38px;
       height: 38px;
@@ -66,10 +68,8 @@ function injectStyles() {
       background: #eef3ff;
       color: #27406f;
     }
-    .settings-profile-preview {
-      position: relative;
-      margin-bottom: 22px;
-    }
+    .settings-profile-editor-title { display: flex; align-items: center; gap: 10px; }
+    .settings-profile-preview { position: relative; margin-bottom: 22px; }
     .settings-profile-cover {
       height: 128px;
       overflow: hidden;
@@ -98,37 +98,22 @@ function injectStyles() {
     .settings-profile-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
     .settings-profile-form input,
     .settings-profile-form textarea {
-      width: 100%;
-      box-sizing: border-box;
-      border: 1px solid #dce4f4;
-      border-radius: 14px;
-      padding: 12px 13px;
-      background: #f8faff;
-      color: #182036;
-      font: inherit;
-      outline: none;
+      width: 100%; box-sizing: border-box; border: 1px solid #dce4f4;
+      border-radius: 14px; padding: 12px 13px; background: #f8faff;
+      color: #182036; font: inherit; outline: none;
     }
     .settings-profile-form textarea { min-height: 82px; resize: vertical; }
     .settings-profile-upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .settings-profile-upload {
-      position: relative;
-      display: grid !important;
-      place-items: center;
-      min-height: 48px;
-      border-radius: 14px;
-      background: #eef4ff;
-      color: #315dba;
-      text-align: center;
+      position: relative; display: grid !important; place-items: center;
+      min-height: 48px; border-radius: 14px; background: #eef4ff;
+      color: #315dba; text-align: center;
     }
     .settings-profile-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
     .settings-profile-save {
-      border: 0;
-      border-radius: 15px;
-      padding: 13px 16px;
+      border: 0; border-radius: 15px; padding: 13px 16px;
       background: linear-gradient(135deg, #4f7cff, #43b9f6);
-      color: #fff;
-      font-weight: 800;
-      font-size: 15px;
+      color: #fff; font-weight: 800; font-size: 15px;
     }
   `;
   document.head.appendChild(style);
@@ -138,9 +123,7 @@ function syncNavbarOrder() {
   document.querySelectorAll('.topbar-actions').forEach((actions) => {
     const avatar = actions.querySelector('.top-avatar');
     const menu = actions.querySelector('#settingsBtn');
-    if (avatar && menu && avatar.previousElementSibling !== menu) {
-      actions.append(menu, avatar);
-    }
+    if (avatar && menu && avatar.previousElementSibling !== menu) actions.append(menu, avatar);
   });
 }
 
@@ -148,7 +131,6 @@ function updateSettingsProfileRow() {
   const profile = getProfile();
   const row = document.querySelector('.settings-list > article:first-child');
   if (!profile || !row) return;
-
   const name = row.querySelector('strong');
   const username = row.querySelector('p');
   const avatar = row.querySelector('.avatar');
@@ -157,11 +139,7 @@ function updateSettingsProfileRow() {
     name.innerHTML = `${profile.name || 'Axynera User'}${badges}`;
   }
   if (username) username.textContent = `@${profile.username || 'axynera_user'}`;
-  if (avatar) {
-    avatar.innerHTML = profile.photo
-      ? `<img src="${profile.photo}" alt="${profile.name || 'Profile'}" />`
-      : initials(profile.name);
-  }
+  if (avatar) avatar.innerHTML = profile.photo ? `<img src="${profile.photo}" alt="${profile.name || 'Profile'}" />` : initials(profile.name);
 }
 
 function fileToDataUrl(file) {
@@ -173,21 +151,37 @@ function fileToDataUrl(file) {
   });
 }
 
+function closeProfileEditor({ fromHistory = false } = {}) {
+  const shade = document.querySelector('.settings-profile-editor-shade');
+  if (!shade) return;
+  shade.remove();
+  if (profileEditorHistoryActive && !fromHistory && history.state?.axyneraProfileEditor) history.back();
+  profileEditorHistoryActive = false;
+}
+
 function openProfileEditor() {
   if (document.querySelector('.settings-profile-editor-shade')) return;
   const profile = getProfile();
   if (!profile) return;
+
+  if (!history.state?.axyneraProfileEditor) {
+    history.pushState({ ...(history.state || {}), axyneraProfileEditor: true }, '', location.href);
+    profileEditorHistoryActive = true;
+  }
 
   const shade = document.createElement('div');
   shade.className = 'settings-profile-editor-shade';
   shade.innerHTML = `
     <section class="settings-profile-editor" role="dialog" aria-modal="true" aria-label="Edit profil">
       <div class="settings-profile-editor-head">
-        <h2>Profil Saya</h2>
+        <div class="settings-profile-editor-title">
+          <button class="settings-profile-editor-back" type="button" aria-label="Kembali">‹</button>
+          <h2>Edit Profil</h2>
+        </div>
         <button class="settings-profile-editor-close" type="button" aria-label="Tutup">×</button>
       </div>
       <div class="settings-profile-preview">
-        <div class="settings-profile-cover">${profile.cover ? `<img id="settingsCoverPreview" src="${profile.cover}" alt="Sampul profil" />` : '<span id="settingsCoverPreview"></span>'}</div>
+        <div class="settings-profile-cover">${profile.cover ? `<img src="${profile.cover}" alt="Sampul profil" />` : ''}</div>
         <div class="settings-profile-avatar" id="settingsAvatarPreview">${profile.photo ? `<img src="${profile.photo}" alt="Foto profil" />` : initials(profile.name)}</div>
       </div>
       <form class="settings-profile-form" id="settingsProfileForm">
@@ -206,11 +200,10 @@ function openProfileEditor() {
 
   let photo = profile.photo || '';
   let cover = profile.cover || '';
-  const close = () => shade.remove();
+  const close = () => closeProfileEditor();
+  shade.querySelector('.settings-profile-editor-back').addEventListener('click', close);
   shade.querySelector('.settings-profile-editor-close').addEventListener('click', close);
-  shade.addEventListener('click', (event) => {
-    if (event.target === shade) close();
-  });
+  shade.addEventListener('click', (event) => { if (event.target === shade) close(); });
 
   shade.querySelector('#settingsPhotoInput').addEventListener('change', async (event) => {
     const file = event.target.files?.[0];
@@ -223,7 +216,7 @@ function openProfileEditor() {
     const file = event.target.files?.[0];
     if (!file) return;
     cover = await fileToDataUrl(file);
-    shade.querySelector('.settings-profile-cover').innerHTML = `<img id="settingsCoverPreview" src="${cover}" alt="Sampul profil" />`;
+    shade.querySelector('.settings-profile-cover').innerHTML = `<img src="${cover}" alt="Sampul profil" />`;
   });
 
   shade.querySelector('#settingsProfileForm').addEventListener('submit', (event) => {
@@ -245,8 +238,13 @@ const observer = new MutationObserver(() => {
   updateSettingsProfileRow();
 });
 observer.observe(document.documentElement, { childList: true, subtree: true });
-
 syncNavbarOrder();
+
+window.addEventListener('popstate', () => {
+  if (document.querySelector('.settings-profile-editor-shade')) {
+    closeProfileEditor({ fromHistory: true });
+  }
+});
 
 document.addEventListener('click', (event) => {
   const topAvatar = event.target.closest('.topbar-actions .top-avatar');
@@ -258,6 +256,18 @@ document.addEventListener('click', (event) => {
       settingsButton.click();
       return;
     }
+  }
+
+  const editProfile = event.target.closest('#editProfile');
+  if (editProfile) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const closeModal = document.querySelector('#closeModal');
+    if (closeModal) closeModal.click();
+    const settingsButton = document.querySelector('#settingsBtn');
+    if (settingsButton) settingsButton.click();
+    queueMicrotask(openProfileEditor);
+    return;
   }
 
   const profileRow = event.target.closest('.settings-list > article:first-child');
