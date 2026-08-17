@@ -81,8 +81,8 @@ button { border: 0; cursor: pointer; }
 }
 
 .brand-logo-img {
-  width: min(68vw, 240px);
-  height: 44px;
+  width: clamp(150px, 42vw, 230px);
+  height: 48px;
 }
 
 .brand-icon-img {
@@ -398,6 +398,16 @@ button { border: 0; cursor: pointer; }
   gap: 11px;
 }
 
+.topbar-logo-lockup {
+  display: grid;
+  gap: 0;
+  align-content: center;
+}
+
+.topbar-logo-lockup .brand-logo-img {
+  margin-left: -10px;
+}
+
 .topbar-brand {
   display: flex;
   align-items: center;
@@ -419,17 +429,18 @@ button { border: 0; cursor: pointer; }
 }
 
 .topbar p {
-  margin: 3px 0 0;
+  margin: -2px 0 0 56px;
   color: var(--muted);
   font-size: 12px;
 }
 
 .topbar-actions {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.topbar-actions button {
+.topbar-actions button:not(.avatar) {
   display: grid;
   place-items: center;
   width: 38px;
@@ -586,8 +597,9 @@ button.avatar:active {
 }
 
 .avatar.top-avatar {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.16);
 }
 
 .avatar.profile-avatar {
